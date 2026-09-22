@@ -59,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Switched to 2.5 to bypass 3.6 rate limits
+      model: 'gemini-3.6-flash',
       contents: userMsg,
       config: {
         systemInstruction: customSystemInstruction || "You are a data analyzer. Base your reports and analysis entirely on the type of data provided.",
