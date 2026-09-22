@@ -34,9 +34,14 @@ const drillDownData: Record<string, any[]> = {
 const RiskAnalysisReport = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'pending'>>({});
 
   const handlePieClick = (data: any) => {
     setSelectedCategory(selectedCategory === data.name ? null : data.name);
+  };
+
+  const handleApproval = (id: string, status: 'approved' | 'rejected') => {
+    setApprovals(prev => ({ ...prev, [id]: status }));
   };
 
   const exportToPPT = () => {
@@ -189,32 +194,57 @@ const RiskAnalysisReport = () => {
         </div>
       </div>
 
-      {/* Drill Down Section - Dynamically renders based on pie chart clicks */}
+    // Deep Dive Section - Dynamically renders based on pie chart clicks
       {selectedCategory && (
         <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-6 animate-fade-in">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">{selectedCategory} Risks Breakdown</h2>
-              <p className="text-sm text-gray-500">Filtering underlying source data (risk_matrix.csv) for {selectedCategory} category.</p>
+              <p className="text-sm text-gray-500">Filtering underlying source data (risk_matrix.csv) for {selectedCategory} category. Needs review.</p>
             </div>
             <button onClick={() => setSelectedCategory(null)} className="text-sm text-brand-blue hover:underline">Close Layer</button>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
-            {currentDrillDown.map(item => (
-              <div key={item.id} className="border border-gray-200 bg-gray-50/50 rounded-lg p-5">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded">{item.id}</span>
-                  <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
+            {currentDrillDown.map(item => {
+              const status = approvals[item.id] || 'pending';
+              return (
+                <div key={item.id} className={`border rounded-lg p-5 transition ${
+                  status === 'approved' ? 'border-green-300 bg-green-50/50' : 
+                  status === 'rejected' ? 'border-red-300 bg-red-50/50' : 
+                  'border-gray-200 bg-gray-50/50'
+                }`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded">{item.id}</span>
+                    <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mt-2 mb-2">{item.name}</h3>
+                  <p className="text-sm text-gray-700 mb-4">{item.desc}</p>
+                  <div className="flex justify-between items-end">
+                    <div className="flex gap-2">
+                      <span className={`text-xs px-2 py-1 rounded ${item.likelihood === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>Likelihood: {item.likelihood}</span>
+                      <span className={`text-xs px-2 py-1 rounded ${item.impact === 'High' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>Impact: {item.impact}</span>
+                    </div>
+                    
+                    {/* Inline Approval Controls */}
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => handleApproval(item.id, 'approved')}
+                        className={`text-xs px-3 py-1.5 rounded transition ${status === 'approved' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                      >
+                        Approve
+                      </button>
+                      <button 
+                        onClick={() => handleApproval(item.id, 'rejected')}
+                        className={`text-xs px-3 py-1.5 rounded transition ${status === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-900 mt-2 mb-2">{item.name}</h3>
-                <p className="text-sm text-gray-700 mb-4">{item.desc}</p>
-                <div className="flex gap-2">
-                  <span className={`text-xs px-2 py-1 rounded ${item.likelihood === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>Likelihood: {item.likelihood}</span>
-                  <span className={`text-xs px-2 py-1 rounded ${item.impact === 'High' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>Impact: {item.impact}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

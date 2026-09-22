@@ -127,7 +127,7 @@ const EmployeeHome = () => {
 
           <div className="mb-6">
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               
               <div 
                 onClick={() => navigate('/report')}
@@ -163,16 +163,6 @@ const EmployeeHome = () => {
                 <p className="text-xs text-gray-500 mt-1">1 anomaly flagged this month</p>
               </div>
 
-              <div 
-                onClick={() => navigate('/admin')}
-                className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition"
-              >
-                <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mb-6 text-orange-500">
-                  <CalendarClock size={18} />
-                </div>
-                <h3 className="font-semibold text-sm text-gray-800">Admin Pipeline</h3>
-                <p className="text-xs text-gray-500 mt-1">Manage flags & data gates</p>
-              </div>
             </div>
           </div>
         </div>
