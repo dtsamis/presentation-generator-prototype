@@ -76,24 +76,23 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button (Middle Right Edge) */}
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-brand-blue text-white pl-5 pr-6 py-4 rounded-full shadow-2xl hover:bg-blue-700 transition z-50 flex items-center justify-center gap-3 hover:scale-105 animate-bounce"
-          style={{ animationIterationCount: 3 }}
+          className="fixed right-0 top-1/2 -translate-y-1/2 bg-brand-blue text-white px-3 py-4 rounded-l-xl shadow-2xl hover:bg-blue-700 transition z-50 flex flex-col items-center justify-center gap-2 hover:-translate-x-1"
         >
           <div className="relative">
             <MessageSquare size={24} />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-brand-blue rounded-full"></span>
           </div>
-          <span className="font-semibold whitespace-nowrap">Ask AI Assistant</span>
+          <span className="font-semibold text-xs text-center leading-tight">Ask<br/>AI</span>
         </button>
       )}
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden animate-fade-in">
+        <div className="fixed right-6 top-1/2 -translate-y-1/2 w-96 h-[550px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden animate-fade-in">
           <div className="bg-brand-blue text-white p-4 flex justify-between items-center shadow-sm z-10">
             <div className="flex items-center gap-2">
               <MessageSquare size={18} />
