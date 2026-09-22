@@ -34,7 +34,7 @@ const GeneralReportView = () => {
 
     const generateDynamicLayout = async () => {
       try {
-        const prompt = `You are a dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. RETURN ONLY VALID JSON without markdown formatting. Do not include introductory text:
+        const prompt = `You are a Customer Feedback Analysis dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. Focus your KPIs, charts, and insights on customer sentiment, feedback trends, and service-level analysis based on the text. RETURN ONLY VALID JSON without markdown formatting. Do not include introductory text:
 {
   "kpis": [
     { "label": "String (e.g. Total Responses)", "value": "String (e.g. 1,450)", "subtext": "String (e.g. +5% vs prev)" }

@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { OpenAI } = require('openai');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const port = 3001;
@@ -9,9 +9,14 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize OpenAI client
-const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-console.log('OpenAI API key loaded successfully.');
+// Initialize Gemini client
+let ai;
+if (process.env.GEMINI_API_KEY) {
+  ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  console.log('Gemini API key loaded successfully.');
+} else {
+  console.warn('WARNING: GEMINI_API_KEY is not set in backend/.env');
+}
 
 // Mock API endpoints for dashboard data
 app.get('/api/kpis', (req, res) => {
@@ -40,23 +45,27 @@ app.post('/api/chat', async (req, res) => {
   const userMsg = req.body.message;
   const customSystemInstruction = req.body.systemInstruction;
   
+  if (!ai) {
+    return res.json({ reply: 'System: GEMINI_API_KEY is not set.' });
+  }
+
   let attempt = 0;
   const maxAttempts = 3;
   while (attempt < maxAttempts) {
     try {
-      const response = await ai.chat.completions.create({
-        model: 'gpt-4o', // using standard fast/capable model
-        messages: [
-            { role: 'system', content: customSystemInstruction || 'You are a data analyzer. Base your reports and analysis entirely on the type of data provided.' },
-            { role: 'user', content: userMsg }
-        ]
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.6-flash',
+        contents: userMsg,
+        config: {
+          systemInstruction: customSystemInstruction || 'You are a data analyzer. Base your reports and analysis entirely on the type of data provided.',
+        }
       });
-      return res.json({ reply: response.choices[0].message.content });
+      return res.json({ reply: response.text });
     } catch (error) {
       if (error.status === 429 && attempt < maxAttempts - 1) {
         attempt++;
-        console.warn('Rate limit hit (429). Retrying attempt ' + attempt + '... waiting 5 seconds.');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.warn('Rate limit hit (429). Retrying attempt ' + attempt + '... waiting 25 seconds.');
+        await new Promise(resolve => setTimeout(resolve, 25000));
       } else if (error.status === 429) {
         console.error('Rate limit completely exhausted:', error);
         return res.status(429).json({ reply: 'API Quota Exceeded. Please wait 1 minute before trying again.' });

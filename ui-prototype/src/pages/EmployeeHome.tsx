@@ -69,7 +69,7 @@ const EmployeeHome = () => {
       const data = await res.json();
       const aiReply = data.reply || "";
 
-      let reportTitle = "General Performance Report";
+      let reportTitle = "Customer Analysis Report";
       if (aiReply.toUpperCase().startsWith("VALID:")) {
         reportTitle = aiReply.replace(/VALID:\s*/i, "").trim();
       }
