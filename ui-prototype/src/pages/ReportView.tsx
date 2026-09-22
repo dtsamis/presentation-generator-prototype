@@ -44,39 +44,12 @@ const ReportView = () => {
   const navigate = useNavigate();
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
-  const [aiSuggestion, setAiSuggestion] = useState<string>('');
-  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
 
   const sources: string[] = location.state?.sources || ['fraud_logs.csv'];
 
   const handleBarClick = (data: any) => {
     setSelectedRegion(selectedRegion === data.name ? null : data.name);
   };
-
-  useEffect(() => {
-    if (!selectedRegion) return;
-    setLoadingSuggestion(true);
-    setAiSuggestion('');
-    
-    // Call our LLM backend
-    fetch('http://localhost:3001/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: `Analyze this fraud data for the ${selectedRegion} region: ${JSON.stringify(drillDownData[selectedRegion])}. Provide a single, short paragraph (under 40 words) suggesting exactly one actionable improvement to reduce these fraud incidents.`
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      setAiSuggestion(data.reply);
-      setLoadingSuggestion(false);
-    })
-    .catch(e => {
-      console.error(e);
-      setAiSuggestion("Implement stricter IP velocity limits and require step-up authentication for high-risk regions.");
-      setLoadingSuggestion(false);
-    });
-  }, [selectedRegion]);
 
   const exportToPPT = () => {
     setIsExporting(true);
@@ -273,24 +246,6 @@ const ReportView = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-
-          {/* AI Suggestion Block */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 flex gap-4 items-start">
-            <div className="bg-white p-2 text-brand-blue rounded-full shadow-sm border border-blue-100">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-800 text-sm mb-1">AI Improvement Suggestion</h3>
-              {loadingSuggestion ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <div className="w-3 h-3 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
-                  Analyzing patterns...
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 leading-relaxed">{aiSuggestion}</p>
-              )}
-            </div>
           </div>
         </div>
       )}
