@@ -57,7 +57,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          message: `SYSTEM RULE: You must base your analysis ONLY on the attached JSON Context Data provided below (which represents the files attached in this current session). When the user navigates away or back to home, files are detached and this context changes. HARD RULE: Do not hallucinate or create irrelevant categories, metrics, or insights not explicitly supported by this context data. If asked something outside this scope, politely decline.\n\nContext Data from attached files:\n${context}\n\nUser Question: ${prompt}` 
+          message: `Context Data from attached files:\n${context}\n\nUser Question: ${prompt}` 
         })
       });
       

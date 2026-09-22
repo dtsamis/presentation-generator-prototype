@@ -56,19 +56,13 @@ const EmployeeHome = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `You are a strict data validator. The user selected report type: '${activeView}'. The uploaded CSV file has this content:\n\n${fileContext}\n\nRULES:\n1. If report type is 'upload_transactions', the data MUST have transaction, behavior, or customer-related columns. If invalid, reply "INVALID: You uploaded the wrong type of data."\n2. If report type is 'upload_risk', the data MUST have risk-related columns. If invalid, reply "INVALID: You uploaded the wrong type of data."\n3. If report type is 'upload_general', you MUST ACCEPT ANY DATA. Do not reject it.\n\nIf the data is INVALID, reply EXACTLY with "INVALID: [Reason]".\nIf the data is VALID, reply EXACTLY with "VALID: [A concise, professional 3-5 word title for the report based on the data]".`
+          message: `You are a data analyzer. Based on the following data sample:\n\n${fileContext}\n\nProvide a concise, professional 3-5 word title for a report based on this data type. Reply EXACTLY with "VALID: [Your Title]".`
         })
       });
 
       const data = await res.json();
       const aiReply = data.reply || "";
 
-      if (aiReply.toUpperCase().startsWith("INVALID")) {
-        setErrorMessage(aiReply.replace(/INVALID:\s*/i, "").trim());
-        setIsUploading(false);
-        return;
-      }
-      
       let reportTitle = "General Performance Report";
       if (aiReply.toUpperCase().startsWith("VALID:")) {
         reportTitle = aiReply.replace(/VALID:\s*/i, "").trim();
