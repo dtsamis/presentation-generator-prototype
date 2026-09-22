@@ -59,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash', // Fast model suitable for chat
+      model: 'gemini-2.5-flash', // Switched to 2.5 to bypass 3.6 rate limits
       contents: userMsg,
       config: {
         systemInstruction: customSystemInstruction || "You are a strict context-aware Assistant for a presentation generator. HARD RULE: You must base all reports and answers ONLY on the context/files provided in the current session. Do not hallucinate, and do not invent irrelevant categories or data not found in the provided context. Keep your answers concise and professional.",
