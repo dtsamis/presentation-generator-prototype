@@ -139,11 +139,11 @@ const ReportView = () => {
           </div>
         </div>
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
-          <div className="bg-blue-50 text-brand-blue p-3 rounded-lg"><Clock size={24} /></div>
+          <div className="bg-blue-50 text-brand-blue p-3 rounded-lg"><CheckCircle size={24} /></div>
           <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Avg Trust Score</p>
-            <h3 className="text-2xl font-black text-gray-800">14.2h</h3>
-            <p className="text-xs text-gray-500 font-semibold mt-1">Time to Resolve</p>
+            <h3 className="text-2xl font-black text-gray-800">81%</h3>
+            <p className="text-xs text-gray-500 font-semibold mt-1">Across all regions</p>
           </div>
         </div>
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
@@ -182,7 +182,7 @@ const ReportView = () => {
         {/* Chart 2 */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-700 mb-1">Regional Customer Trust Score</h2>
-          <p className="text-xs text-gray-500 mb-1">Percentage of incidents Trusted Transactions within the 24-hour Service Level Agreement.</p>
+          <p className="text-xs text-gray-500 mb-1">Average customer trust score by region, based on transaction verification signals.</p>
           <p className="text-xs text-brand-blue mb-4 font-semibold">Click a region bar to drill down into localized incidents</p>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -273,7 +273,7 @@ const ReportView = () => {
             <div className="w-2 h-2 rounded-full bg-orange-500 mt-2"></div>
             <div>
               <h3 className="font-semibold text-orange-900">LATAM Performance Drop (65%)</h3>
-              <p className="text-sm text-orange-700 mt-1">Primarily driven by a backlog in manual reviews for Velocity Checks. SLA breached by 14 hours on average.</p>
+              <p className="text-sm text-orange-700 mt-1">Primarily driven by a backlog in manual reviews for Velocity Checks.</p>
             </div>
           </div>
         </div>

@@ -36,7 +36,6 @@ const EmployeeHome = () => {
     setErrorMessage('');
     
     try {
-      let fileContext = "";
       let fullText = "";
       if (uploadedFiles.length > 0) {
         const file = uploadedFiles[0];
@@ -49,14 +48,25 @@ const EmployeeHome = () => {
         } else {
           fullText = await file.text();
         }
-        fileContext = fullText.split('\n').slice(0, 3).join('\n');
       }
 
+      // Use a much richer sample (up to 40 rows, not just 3) so the AI can
+      // reliably recognize what the uploaded file is actually about, instead
+      // of guessing from a couple of header lines.
+      const classificationSample = fullText ? fullText.split('\n').slice(0, 40).join('\n') : "";
+
+      // Ask the AI to identify the REAL business domain of this file (it could be
+      // literally anything a business tracks - marketing, finance, HR, sales,
+      // operations, risk, customer feedback, compliance, logistics, etc.) and give
+      // it a fitting report title. We deliberately avoid framing this as generic
+      // "data processing/analysis" so the resulting report reads like a genuine,
+      // domain-specific business report rather than a technical data summary.
       const res = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `You are a data analyzer. Based on the following data sample:\n\n${fileContext}\n\nProvide a concise, professional 3-5 word title for a report based on this data type. Reply EXACTLY with "VALID: [Your Title]".`
+          message: `You are reviewing a real business file uploaded by an employee. Here is a sample of its actual contents:\n\n${classificationSample}\n\nBased on what this data ACTUALLY represents (it could be marketing, financial, HR/workforce, sales, operations, risk & compliance, customer feedback, logistics, IT/security, or any other real business domain — do not default to a generic category), do two things:\n1. Name the single best-fit business domain in 2-4 words.\n2. Write a concise, professional 3-6 word title for a report built from this exact data.\n\nReply EXACTLY in this format with no extra commentary:\nVALID: [Your Title]\nCATEGORY: [Your Domain]`,
+          systemInstruction: 'You are a senior business analyst who specializes in quickly recognizing what real-world business function a dataset belongs to, purely from its content and column names. Never default to a generic "data" or "processing" label if a more specific business domain is evident.'
         })
       });
 
@@ -67,15 +77,23 @@ const EmployeeHome = () => {
       }
 
       const data = await res.json();
-      const aiReply = data.reply || "";
+      const aiReply: string = data.reply || "";
 
-      let reportTitle = "Customer Analysis Report";
-      if (aiReply.toUpperCase().startsWith("VALID:")) {
-        reportTitle = aiReply.replace(/VALID:\s*/i, "").trim();
-      }
+      let reportTitle = "Business Performance Report";
+      let reportCategory = "General Business";
+      aiReply.split('\n').map((l: string) => l.trim()).filter(Boolean).forEach((line: string) => {
+        if (line.toUpperCase().startsWith("VALID:")) {
+          reportTitle = line.replace(/VALID:\s*/i, "").trim();
+        } else if (line.toUpperCase().startsWith("CATEGORY:")) {
+          reportCategory = line.replace(/CATEGORY:\s*/i, "").trim();
+        }
+      });
       
-      const fileData = fullText ? fullText.split('\n').slice(0, 50).join('\n') : "";
-      const state = { sources: uploadedFiles.map(f => f.name), reportTitle, fileData };
+      // Pass a generous chunk of the real file content downstream (not just a
+      // preview) so the report-generation step can build the dashboard from the
+      // actual uploaded data rather than reasoning about it abstractly.
+      const fileData = fullText ? fullText.split('\n').slice(0, 200).join('\n') : "";
+      const state = { sources: uploadedFiles.map(f => f.name), reportTitle, reportCategory, fileData };
       
       if (activeView === 'upload_risk') {
         navigate('/report/risk', { state });
@@ -219,7 +237,7 @@ const EmployeeHome = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-xl text-gray-800 mb-2">General Report</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">Standard metrics and performance visualization. Great for generic or overarching datasets.</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">Upload any business dataset — the AI detects what it's actually about (marketing, finance, HR, sales, operations, etc.) and builds a tailored dashboard around it.</p>
                 </div>
               </div>
 
@@ -256,7 +274,7 @@ const EmployeeHome = () => {
         )}
 
         {/* Upload Views */}
-        {activeView === 'upload_general' && renderUploadWindow('General Report', 'Upload standard metric files for a generic performance deck.')}
+        {activeView === 'upload_general' && renderUploadWindow('General Report', 'Upload any dataset. The AI will detect what business domain it actually represents and build a matching dashboard.')}
         {activeView === 'upload_transactions' && renderUploadWindow('Transactions Analysis Report', 'Upload transaction logs and customer behavior files for the transactions analysis deck.')}
         {activeView === 'upload_risk' && renderUploadWindow('Risk Analysis', 'Upload incident reports and matrices for the interactive risk analysis deck.')}
 

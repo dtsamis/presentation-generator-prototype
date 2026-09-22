@@ -23,7 +23,13 @@ const GeneralReportView = () => {
   const [dynamicData, setDynamicData] = useState<any>(null);
 
   const sources: string[] = location.state?.sources || ['uploaded_file.csv'];
-  const dynamicTitle = location.state?.reportTitle || "General Performance Report";
+  const dynamicTitle = location.state?.reportTitle || "Business Performance Report";
+  // The data domain is detected on the Home screen by inspecting the actual
+  // uploaded file content (e.g. "Marketing Performance", "Risk Management",
+  // "Customer Feedback", "Financial Performance", "HR & Workforce", etc.).
+  // We use it here to build a report that's genuinely about that domain,
+  // instead of treating every upload as generic "data processing".
+  const dynamicCategory = location.state?.reportCategory || "General Business";
   const fileData = location.state?.fileData || "";
 
   useEffect(() => {
@@ -34,24 +40,38 @@ const GeneralReportView = () => {
 
     const generateDynamicLayout = async () => {
       try {
-        const prompt = `You are a Customer Feedback Analysis dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. Focus your KPIs, charts, and insights on customer sentiment, feedback trends, and service-level analysis based on the text. RETURN ONLY VALID JSON without markdown formatting. Do not include introductory text:
+        // The prompt below is intentionally written as a request to a business
+        // report author (not a "data analyzer") so the resulting KPIs, charts,
+        // and insights read like a real ${dynamicCategory} report grounded in
+        // the actual uploaded rows, not an abstract description of the file.
+        // We also require separate human-readable "Label" fields for every
+        // chart series, decoupled from the raw JSON data keys, so the legend
+        // and tooltips never show generic placeholders like "val1"/"val2".
+        const prompt = `You are writing a real ${dynamicCategory} report for business stakeholders. Here is the actual uploaded data (CSV):\n\n${fileData}\n\nUsing ONLY what this data actually shows, produce a JSON object strictly matching the schema below. The KPIs, charts, and insights must be grounded in the real values/rows above and clearly relevant to ${dynamicCategory} (e.g. if this is Marketing data, focus on campaign performance/reach/conversion; if Financial, focus on revenue/costs/margins; if HR, focus on headcount/attrition/engagement; if Risk, focus on exposure/likelihood/impact; if Customer Feedback, focus on sentiment/satisfaction; otherwise pick whatever angle best fits the real content).
+
+IMPORTANT: Every chart series must have a clear, human-readable, business-meaningful label. NEVER use placeholder/generic names like "val1", "val2", "value", "series1", etc. anywhere a human-facing label is expected. The "lineLabel", "barKey1Label", and "barKey2Label" fields especially must read like something a real business user would see on a chart legend (e.g. "Avg. Satisfaction Score", "Flagged Transactions", "Monthly Revenue ($)").
+
+RETURN ONLY VALID JSON, no markdown, no commentary:
 {
   "kpis": [
-    { "label": "String (e.g. Total Responses)", "value": "String (e.g. 1,450)", "subtext": "String (e.g. +5% vs prev)" }
+    { "label": "String (short human-readable KPI name)", "value": "String", "subtext": "String" }
   ],
   "chart1": {
-    "title": "String",
-    "data": [ { "name": "Category", "val1": 10 } ],
-    "lineKey": "val1"
+    "title": "String (human-readable chart title)",
+    "data": [ { "name": "Category", "metric": 10 } ],
+    "lineKey": "metric",
+    "lineLabel": "String (human-readable legend label for this line, e.g. 'Avg. Response Time (days)')"
   },
   "chart2": {
-    "title": "String",
-    "data": [ { "name": "Category", "val1": 20, "val2": 15 } ],
-    "barKey1": "val1",
-    "barKey2": "val2"
+    "title": "String (human-readable chart title)",
+    "data": [ { "name": "Category", "metricA": 20, "metricB": 15 } ],
+    "barKey1": "metricA",
+    "barKey1Label": "String (human-readable legend label, e.g. 'Positive Feedback')",
+    "barKey2": "metricB",
+    "barKey2Label": "String (human-readable legend label, e.g. 'Negative Feedback')"
   },
   "insights": [
-    { "title": "String (e.g. Sentiment Shift)", "description": "String (2-3 sentences explaining a pattern)" }
+    { "title": "String", "description": "String (2-3 sentences grounded in the actual data)" }
   ]
 }`;
         const res = await fetch('http://localhost:3001/api/chat', {
@@ -59,7 +79,7 @@ const GeneralReportView = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             message: prompt,
-            systemInstruction: "You are a data analyzer. You MUST output ONLY valid JSON matching the schema. It is OK to synthesize KPI titles and insights based on the data. Do NOT include markdown blocks."
+            systemInstruction: `You are an expert ${dynamicCategory} report author. You MUST output ONLY valid JSON matching the schema, derived from the real data provided. All chart legend labels must be human-readable business terms, never generic placeholders. Do NOT include markdown blocks or explanations.`
           })
         });
 
@@ -120,6 +140,7 @@ const GeneralReportView = () => {
 
   const reportContext = JSON.stringify({
     reportType: dynamicTitle,
+    reportCategory: dynamicCategory,
     dataPreview: dynamicData || "No parsed data available"
   });
 
@@ -127,7 +148,7 @@ const GeneralReportView = () => {
     return (
       <div className="max-w-6xl mx-auto p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-        <h2 className="text-xl font-bold text-gray-800 animate-pulse">Analyzing file structure & generating dynamic dashboard...</h2>
+        <h2 className="text-xl font-bold text-gray-800 animate-pulse">Building your {dynamicCategory} report from the uploaded data...</h2>
       </div>
     );
   }
@@ -136,7 +157,7 @@ const GeneralReportView = () => {
     return (
       <div className="max-w-4xl mx-auto mt-20 p-8 flex flex-col items-center justify-center text-center bg-red-50 border-2 border-red-200 rounded-2xl">
         <h2 className="text-2xl font-bold text-red-700 mb-2">API Rate Limit Exceeded</h2>
-        <p className="text-red-600 mb-6">We've hit the Gemini Free Tier limit of 20 requests per minute. Please wait 1 minute before trying again.</p>
+        <p className="text-red-600 mb-6">We've hit the API rate limit. Please wait a moment before trying again.</p>
         <button onClick={() => navigate('/')} className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition">Go Back</button>
       </div>
     );
@@ -152,15 +173,24 @@ const GeneralReportView = () => {
   const chart1 = dynamicData?.chart1 || {
     title: "Primary Trend",
     data: fallbackPerformanceData,
-    lineKey: "revenue"
+    lineKey: "revenue",
+    lineLabel: "Revenue ($)"
   };
 
   const chart2 = dynamicData?.chart2 || {
     title: "Category Distribution",
     data: fallbackMetricData,
     barKey1: "growth",
-    barKey2: "attrition"
+    barKey1Label: "Growth Rate (%)",
+    barKey2: "attrition",
+    barKey2Label: "Attrition Rate (%)"
   };
+
+  // Fall back to the raw data key itself only if the AI didn't provide a
+  // dedicated human-readable label, so the legend never shows nothing.
+  const chart1LineLabel = chart1.lineLabel || chart1.lineKey;
+  const chart2BarLabel1 = chart2.barKey1Label || chart2.barKey1;
+  const chart2BarLabel2 = chart2.barKey2Label || chart2.barKey2;
 
   return (
     <div className="max-w-6xl mx-auto p-8 pb-20">
@@ -169,7 +199,10 @@ const GeneralReportView = () => {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold mb-1">{dynamicTitle}</h1>
-            <p className="text-sm text-indigo-200 mb-4">Based on data from: {sources.join(', ')}</p>
+            <p className="text-sm text-indigo-200 mb-2">Based on data from: {sources.join(', ')}</p>
+            <span className="inline-block bg-indigo-800/60 border border-indigo-600 text-indigo-100 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide">
+              Report Focus: {dynamicCategory}
+            </span>
           </div>
           <div className="flex gap-3">
             <button 
@@ -215,7 +248,7 @@ const GeneralReportView = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
                 <RechartsTooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
                 <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
-                <Line type="monotone" dataKey={chart1.lineKey} stroke="#4F46E5" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
+                <Line type="monotone" name={chart1LineLabel} dataKey={chart1.lineKey} stroke="#4F46E5" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -232,8 +265,8 @@ const GeneralReportView = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
                 <RechartsTooltip cursor={{fill: '#F3F4F6'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
                 <Legend iconType="circle" wrapperStyle={{paddingTop: '10px'}} />
-                <Bar name={chart2.barKey1} dataKey={chart2.barKey1} fill="#10B981" radius={[4, 4, 0, 0]} />
-                {chart2.barKey2 && <Bar name={chart2.barKey2} dataKey={chart2.barKey2} fill="#F43F5E" radius={[4, 4, 0, 0]} />}
+                <Bar name={chart2BarLabel1} dataKey={chart2.barKey1} fill="#10B981" radius={[4, 4, 0, 0]} />
+                {chart2.barKey2 && <Bar name={chart2BarLabel2} dataKey={chart2.barKey2} fill="#F43F5E" radius={[4, 4, 0, 0]} />}
               </BarChart>
             </ResponsiveContainer>
           </div>

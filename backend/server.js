@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { GoogleGenAI } = require('@google/genai');
+const OpenAI = require('openai');
 
 const app = express();
 const port = 3001;
@@ -9,13 +9,17 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Gemini client
+// Initialize OpenRouter client (OpenAI-compatible API)
+const OPENROUTER_MODEL = 'openai/gpt-4o-mini';
 let ai;
-if (process.env.GEMINI_API_KEY) {
-  ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  console.log('Gemini API key loaded successfully.');
+if (process.env.OPENROUTER_API_KEY) {
+  ai = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
+  });
+  console.log('OpenRouter API key loaded successfully. Using model: ' + OPENROUTER_MODEL);
 } else {
-  console.warn('WARNING: GEMINI_API_KEY is not set in backend/.env');
+  console.warn('WARNING: OPENROUTER_API_KEY is not set in backend/.env');
 }
 
 // Mock API endpoints for dashboard data
@@ -44,29 +48,38 @@ app.get('/api/flagged', (req, res) => {
 app.post('/api/chat', async (req, res) => {
   const userMsg = req.body.message;
   const customSystemInstruction = req.body.systemInstruction;
-  
+
   if (!ai) {
-    return res.json({ reply: 'System: GEMINI_API_KEY is not set.' });
+    return res.json({ reply: 'System: OPENROUTER_API_KEY is not set.' });
   }
+
+  // Default framing is intentionally domain-agnostic: this app can receive
+  // ANY kind of business data (marketing, financial, HR, sales, operations,
+  // risk, customer feedback, etc.), so the assistant should act as a
+  // knowledgeable business report author for whatever domain the data
+  // actually represents - not a generic "data processor".
+  const systemInstruction = customSystemInstruction || 'You are an expert business report author. Read the data/context you are given, determine what business domain it actually represents, and respond with clear, insightful, decision-ready analysis tailored to that specific domain.';
 
   let attempt = 0;
   const maxAttempts = 3;
   while (attempt < maxAttempts) {
     try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
-        contents: userMsg,
-        config: {
-          systemInstruction: customSystemInstruction || 'You are a data analyzer. Base your reports and analysis entirely on the type of data provided.',
-        }
+      const completion = await ai.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: systemInstruction },
+          { role: 'user', content: userMsg }
+        ]
       });
-      return res.json({ reply: response.text });
+      const reply = completion.choices?.[0]?.message?.content || '';
+      return res.json({ reply });
     } catch (error) {
-      if (error.status === 429 && attempt < maxAttempts - 1) {
+      const status = error?.status || error?.response?.status;
+      if (status === 429 && attempt < maxAttempts - 1) {
         attempt++;
         console.warn('Rate limit hit (429). Retrying attempt ' + attempt + '... waiting 25 seconds.');
         await new Promise(resolve => setTimeout(resolve, 25000));
-      } else if (error.status === 429) {
+      } else if (status === 429) {
         console.error('Rate limit completely exhausted:', error);
         return res.status(429).json({ reply: 'API Quota Exceeded. Please wait 1 minute before trying again.' });
       } else {
@@ -80,4 +93,3 @@ app.post('/api/chat', async (req, res) => {
 app.listen(port, () => {
   console.log('Backend listening on port ' + port);
 });
-

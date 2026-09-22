@@ -10,8 +10,9 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Simple Global Nav for Prototype */}
-        <header className="bg-white border-b px-6 py-4 flex items-center justify-center shadow-sm z-10 relative">
-          <h1 className="text-xl font-bold text-gray-800 tracking-wide uppercase">AI Presentation Generator</h1>
+        <header className="bg-white border-b px-6 py-4 flex flex-col items-center justify-center shadow-sm z-10 relative gap-1">
+          <h1 className="text-xl font-bold text-gray-800 tracking-wide uppercase">Impact AI</h1>
+          <p className="text-sm text-gray-500 font-medium">Instant Raw Data to Live Dashboards & Presentation Decks</p>
         </header>
 
         <main className="flex-1 overflow-auto">
