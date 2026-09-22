@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import pptxgen from 'pptxgenjs';
 import { Download } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const riskData = [
   { name: 'Cyber', value: 3, color: '#EF4444' }, // Red
@@ -32,9 +33,12 @@ const drillDownData: Record<string, any[]> = {
 };
 
 const RiskAnalysisReport = () => {
+  const location = useLocation();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'pending'>>({});
+
+  const sources: string[] = location.state?.sources || ['risk_matrix.csv'];
 
   const handlePieClick = (data: any) => {
     setSelectedCategory(selectedCategory === data.name ? null : data.name);
@@ -128,8 +132,9 @@ const RiskAnalysisReport = () => {
         <div className="bg-slate-700/50 rounded-lg p-3 inline-block mt-2 border border-slate-600">
           <p className="text-xs font-medium text-white flex items-center gap-2">
             <span className="uppercase tracking-wider text-slate-400">Source Data:</span>
-            <span className="bg-slate-800 px-2 py-1 rounded border border-slate-600">risk_matrix.csv</span>
-            <span className="bg-slate-800 px-2 py-1 rounded border border-slate-600">incidents.csv</span>
+            {sources.map(src => (
+              <span key={src} className="bg-slate-800 px-2 py-1 rounded border border-slate-600">{src}</span>
+            ))}
           </p>
         </div>
       </div>

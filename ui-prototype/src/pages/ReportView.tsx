@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useLocation } from 'react-router-dom';
 
 const data = [
   { name: 'Week 1', flagged: 400, resolved: 240 },
@@ -36,7 +37,10 @@ const drillDownData: Record<string, any[]> = {
 };
 
 const ReportView = () => {
+  const location = useLocation();
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+
+  const sources: string[] = location.state?.sources || ['process_performance.csv'];
 
   const handleBarClick = (data: any) => {
     setSelectedRegion(selectedRegion === data.name ? null : data.name);
@@ -53,8 +57,9 @@ const ReportView = () => {
         <div className="bg-white/10 rounded-lg p-3 inline-block border border-white/20">
           <p className="text-xs font-medium text-white/90 flex items-center gap-2">
             <span className="uppercase tracking-wider text-white/60">Source Data:</span>
-            <span className="bg-white/20 px-2 py-1 rounded">process_performance.csv</span>
-            <span className="bg-white/20 px-2 py-1 rounded">incidents.csv</span>
+            {sources.map(src => (
+              <span key={src} className="bg-white/20 px-2 py-1 rounded">{src}</span>
+            ))}
           </p>
         </div>
       </div>

@@ -68,18 +68,19 @@ const EmployeeHome = () => {
     
     setIsUploading(true);
     const fileName = uploadedFiles[0].name.toLowerCase();
+    const sources = uploadedFiles.map(f => f.name);
     
     // Simulate backend analysis of the uploaded data shape
     setTimeout(() => {
       setIsUploading(false);
       // Dynamic routing based on the provided data
       if (fileName.includes('risk')) {
-        navigate('/report/risk');
+        navigate('/report/risk', { state: { sources } });
       } else if (fileName.includes('performance') || fileName.includes('process')) {
-        navigate('/report');
+        navigate('/report', { state: { sources } });
       } else {
         // Default fallback for demo
-        navigate('/report');
+        navigate('/report', { state: { sources } });
       }
     }, 2000);
   };
