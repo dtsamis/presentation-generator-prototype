@@ -33,47 +33,11 @@ const drillDownData: Record<string, any[]> = {
   ]
 };
 
-const MiniRiskMatrix = ({ likelihood, impact }: { likelihood: string, impact: string }) => {
-  const levels = ['High', 'Med', 'Low'];
-  const impacts = ['Low', 'Med', 'High'];
-  
-  const getCellColor = (l: string, i: string, isMatch: boolean) => {
-    if (!isMatch) return 'bg-slate-100 border-white';
-    if (l === 'High' && i === 'High') return 'bg-red-500 shadow-md ring-1 ring-red-600';
-    if ((l === 'High' && i === 'Med') || (l === 'Med' && i === 'High')) return 'bg-orange-500 shadow-md ring-1 ring-orange-600';
-    if (l === 'Low' && i === 'Low') return 'bg-green-500 shadow-md ring-1 ring-green-600';
-    if ((l === 'Low' && i === 'Med') || (l === 'Med' && i === 'Low')) return 'bg-green-400 shadow-md ring-1 ring-green-500';
-    return 'bg-yellow-400 shadow-md ring-1 ring-yellow-500'; 
-  };
-
-  return (
-    <div className="flex flex-col items-center bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm">
-      <div className="text-[8px] font-bold text-slate-400 mb-1 tracking-widest uppercase">Matrix</div>
-      <div className="flex flex-col gap-[2px]">
-        {levels.map(l => (
-          <div key={l} className="flex gap-[2px]">
-            {impacts.map(i => {
-              const isMatch = likelihood === l && impact === i;
-              return (
-                <div 
-                  key={`${l}-${i}`}
-                  title={`Likelihood: ${l}, Impact: ${i}`}
-                  className={`w-4 h-4 border border-slate-200 rounded-[2px] transition-all duration-300 ${getCellColor(l, i, isMatch)} ${isMatch ? 'scale-110 z-10' : ''}`}
-                />
-              )
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 const RiskAnalysisReport = () => {
   const location = useLocation();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'pending'>>({});
+  const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'unhandled'>>({});
 
   const sources: string[] = location.state?.sources || ['risk_matrix.csv'];
 
@@ -81,8 +45,8 @@ const RiskAnalysisReport = () => {
     setSelectedCategory(selectedCategory === data.name ? null : data.name);
   };
 
-  const handleApproval = (id: string, status: 'approved' | 'rejected') => {
-    setApprovals(prev => ({ ...prev, [id]: status }));
+  const handleApproval = (id: string, status: 'approved' | 'rejected' | 'unhandled') => {
+    setApprovals(prev => ({ ...prev, [id]: prev[id] === status ? 'unhandled' : status }));
   };
 
   const exportToPPT = () => {
@@ -256,7 +220,7 @@ const RiskAnalysisReport = () => {
 
           <div className="grid grid-cols-2 gap-6">
             {currentDrillDown.map(item => {
-              const status = approvals[item.id] || 'pending';
+              const status = approvals[item.id] || 'unhandled';
               return (
                 <div key={item.id} className={`border rounded-xl p-5 transition relative overflow-hidden ${
                   status === 'approved' ? 'border-green-300 bg-green-50/50' : 
@@ -268,8 +232,12 @@ const RiskAnalysisReport = () => {
                       <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded mr-2">{item.id}</span>
                       <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
                     </div>
-                    {/* The Mini Risk Matrix for this specific record */}
-                    <MiniRiskMatrix likelihood={item.likelihood} impact={item.impact} />
+                    {/* Explicit Status Badge */}
+                    <div>
+                      {status === 'approved' && <span className="bg-green-100 text-green-700 border border-green-200 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Approved</span>}
+                      {status === 'rejected' && <span className="bg-red-100 text-red-700 border border-red-200 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Rejected</span>}
+                      {status === 'unhandled' && <span className="bg-slate-100 text-slate-500 border border-slate-200 px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Unhandled</span>}
+                    </div>
                   </div>
                   <h3 className="font-semibold text-gray-900 mt-1 mb-2 pr-12">{item.name}</h3>
                   <p className="text-sm text-gray-700 mb-5">{item.desc}</p>
@@ -283,13 +251,13 @@ const RiskAnalysisReport = () => {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleApproval(item.id, 'approved')}
-                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'approved' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'approved' ? 'bg-green-600 text-white shadow-inner' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
                       >
                         Approve
                       </button>
                       <button 
                         onClick={() => handleApproval(item.id, 'rejected')}
-                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'rejected' ? 'bg-red-600 text-white shadow-inner' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
                       >
                         Reject
                       </button>
