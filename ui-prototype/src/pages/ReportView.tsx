@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import pptxgen from 'pptxgenjs';
-import { Download } from 'lucide-react';
+import { Download, Sparkles } from 'lucide-react';
 import ChatWidget from '../components/ChatWidget';
 
 const data = [
@@ -44,12 +44,39 @@ const ReportView = () => {
   const navigate = useNavigate();
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<string>('');
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
 
   const sources: string[] = location.state?.sources || ['fraud_logs.csv'];
 
   const handleBarClick = (data: any) => {
     setSelectedRegion(selectedRegion === data.name ? null : data.name);
   };
+
+  useEffect(() => {
+    if (!selectedRegion) return;
+    setLoadingSuggestion(true);
+    setAiSuggestion('');
+    
+    // Call our LLM backend
+    fetch('http://localhost:3001/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: `Analyze this fraud data for the ${selectedRegion} region: ${JSON.stringify(drillDownData[selectedRegion])}. Provide a single, short paragraph (under 40 words) suggesting exactly one actionable improvement to reduce these fraud incidents.`
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      setAiSuggestion(data.reply);
+      setLoadingSuggestion(false);
+    })
+    .catch(e => {
+      console.error(e);
+      setAiSuggestion("Implement stricter IP velocity limits and require step-up authentication for high-risk regions.");
+      setLoadingSuggestion(false);
+    });
+  }, [selectedRegion]);
 
   const exportToPPT = () => {
     setIsExporting(true);
@@ -157,12 +184,13 @@ const ReportView = () => {
                   cursor={{fill: '#F3F4F6'}}
                   contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
                 />
+                <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
                 <Bar 
                   dataKey="performance" 
                   fill="#3B82F6" 
                   radius={[4, 4, 0, 0]} 
                   onClick={handleBarClick}
-                  className="cursor-pointer transition duration-300 hover:opacity-80"
+                  className="cursor-pointer hover:opacity-80 transition"
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -172,32 +200,58 @@ const ReportView = () => {
 
       {/* Drill Down Section */}
       {selectedRegion && (
-        <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-8 animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-1">{selectedRegion} Incidents Drill-down</h2>
-              <p className="text-sm text-gray-500">Showing specific transaction flags impacting regional performance scores.</p>
-            </div>
-            <button onClick={() => setSelectedRegion(null)} className="text-sm text-brand-blue hover:underline">Close Layer</button>
+        <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-6 mb-6 animate-fade-in flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-gray-800">Incident Drill-Down: {selectedRegion} Region</h2>
+            <button onClick={() => setSelectedRegion(null)} className="text-sm text-brand-blue hover:underline">Close</button>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            {currentDrillDown.map(item => (
-              <div key={item.id} className="border border-gray-200 bg-gray-50 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded">{item.id}</span>
-                  <span className={`text-xs font-medium px-2 py-1 rounded ${
-                    item.status === 'Blocked' ? 'bg-red-100 text-red-700' : 
-                    item.status === 'Under Review' ? 'bg-orange-100 text-orange-700' : 
-                    'bg-gray-200 text-gray-700'
-                  }`}>
-                    {item.status}
-                  </span>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Incident ID</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount at Risk</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {currentDrillDown.map((incident: any) => (
+                  <tr key={incident.id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 text-sm font-medium text-brand-blue">{incident.id}</td>
+                    <td className="p-3 text-sm text-gray-700">{incident.type}</td>
+                    <td className="p-3 text-sm text-gray-700">{incident.amount}</td>
+                    <td className="p-3">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        ${incident.status === 'Blocked' ? 'bg-red-100 text-red-800' : 
+                          incident.status === 'Escalated' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-blue-100 text-blue-800'}`}>
+                        {incident.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* AI Suggestion Block */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 flex gap-4 items-start">
+            <div className="bg-white p-2 text-brand-blue rounded-full shadow-sm border border-blue-100">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm mb-1">AI Improvement Suggestion</h3>
+              {loadingSuggestion ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="w-3 h-3 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+                  Analyzing patterns...
                 </div>
-                <h3 className="font-semibold text-gray-900 mt-3">{item.type}</h3>
-                <p className="text-sm text-gray-600 mt-1">Value: <span className="font-medium text-gray-900">{item.amount}</span></p>
-              </div>
-            ))}
+              ) : (
+                <p className="text-sm text-gray-600 leading-relaxed">{aiSuggestion}</p>
+              )}
+            </div>
           </div>
         </div>
       )}

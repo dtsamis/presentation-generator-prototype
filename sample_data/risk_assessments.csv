@@ -1,0 +1,60 @@
+RiskID,Category,Description,Likelihood,Impact,MitigationStatus,Owner
+RSK-8001,Cyber,Sample risk description for financial vulnerability,Low,Low,In Progress,Dept_3
+RSK-8002,Operational,Sample risk description for compliance vulnerability,High,Low,Open,Dept_2
+RSK-8003,Compliance,Sample risk description for operational vulnerability,Low,High,In Progress,Dept_4
+RSK-8004,Financial,Sample risk description for operational vulnerability,High,Low,In Progress,Dept_4
+RSK-8005,Financial,Sample risk description for compliance vulnerability,Low,Low,Mitigated,Dept_4
+RSK-8006,Strategic,Sample risk description for cyber vulnerability,High,Medium,In Progress,Dept_5
+RSK-8007,Cyber,Sample risk description for strategic vulnerability,Medium,High,In Progress,Dept_2
+RSK-8008,Strategic,Sample risk description for cyber vulnerability,Low,Medium,Open,Dept_3
+RSK-8009,Financial,Sample risk description for financial vulnerability,Medium,Medium,Mitigated,Dept_1
+RSK-8010,Cyber,Sample risk description for financial vulnerability,Medium,High,Open,Dept_1
+RSK-8011,Cyber,Sample risk description for compliance vulnerability,Medium,Low,Mitigated,Dept_3
+RSK-8012,Cyber,Sample risk description for operational vulnerability,High,High,Mitigated,Dept_5
+RSK-8013,Operational,Sample risk description for strategic vulnerability,Low,High,Mitigated,Dept_5
+RSK-8014,Operational,Sample risk description for financial vulnerability,High,Low,In Progress,Dept_3
+RSK-8015,Compliance,Sample risk description for financial vulnerability,Low,Medium,Open,Dept_4
+RSK-8016,Financial,Sample risk description for cyber vulnerability,Low,Low,Mitigated,Dept_2
+RSK-8017,Compliance,Sample risk description for operational vulnerability,Low,Medium,In Progress,Dept_5
+RSK-8018,Compliance,Sample risk description for cyber vulnerability,Medium,Medium,Mitigated,Dept_4
+RSK-8019,Strategic,Sample risk description for financial vulnerability,High,Low,In Progress,Dept_1
+RSK-8020,Cyber,Sample risk description for operational vulnerability,Low,Medium,In Progress,Dept_5
+RSK-8021,Financial,Sample risk description for financial vulnerability,High,Medium,Mitigated,Dept_2
+RSK-8022,Cyber,Sample risk description for financial vulnerability,Medium,Low,Mitigated,Dept_4
+RSK-8023,Compliance,Sample risk description for strategic vulnerability,Medium,High,Open,Dept_5
+RSK-8024,Cyber,Sample risk description for financial vulnerability,High,Low,Mitigated,Dept_3
+RSK-8025,Strategic,Sample risk description for operational vulnerability,High,Medium,Mitigated,Dept_5
+RSK-8026,Operational,Sample risk description for operational vulnerability,Medium,Medium,In Progress,Dept_3
+RSK-8027,Compliance,Sample risk description for strategic vulnerability,High,Low,Mitigated,Dept_5
+RSK-8028,Compliance,Sample risk description for compliance vulnerability,Medium,High,Mitigated,Dept_3
+RSK-8029,Cyber,Sample risk description for compliance vulnerability,High,Medium,Open,Dept_1
+RSK-8030,Cyber,Sample risk description for financial vulnerability,High,High,Mitigated,Dept_3
+RSK-8031,Strategic,Sample risk description for strategic vulnerability,Medium,Low,Mitigated,Dept_4
+RSK-8032,Cyber,Sample risk description for operational vulnerability,Low,Medium,Mitigated,Dept_1
+RSK-8033,Compliance,Sample risk description for strategic vulnerability,High,Medium,Open,Dept_1
+RSK-8034,Operational,Sample risk description for strategic vulnerability,Low,Medium,In Progress,Dept_5
+RSK-8035,Compliance,Sample risk description for cyber vulnerability,High,High,In Progress,Dept_2
+RSK-8036,Strategic,Sample risk description for compliance vulnerability,High,Low,Mitigated,Dept_4
+RSK-8037,Compliance,Sample risk description for financial vulnerability,Medium,High,Mitigated,Dept_2
+RSK-8038,Compliance,Sample risk description for financial vulnerability,High,Low,Mitigated,Dept_1
+RSK-8039,Cyber,Sample risk description for operational vulnerability,High,Low,Open,Dept_4
+RSK-8040,Compliance,Sample risk description for compliance vulnerability,High,High,Mitigated,Dept_3
+RSK-8041,Operational,Sample risk description for operational vulnerability,Low,Low,Open,Dept_5
+RSK-8042,Financial,Sample risk description for financial vulnerability,Low,High,Open,Dept_1
+RSK-8043,Cyber,Sample risk description for compliance vulnerability,Low,Medium,In Progress,Dept_5
+RSK-8044,Compliance,Sample risk description for strategic vulnerability,Medium,Medium,Open,Dept_1
+RSK-8045,Strategic,Sample risk description for financial vulnerability,High,High,Mitigated,Dept_5
+RSK-8046,Strategic,Sample risk description for compliance vulnerability,Low,High,Open,Dept_5
+RSK-8047,Operational,Sample risk description for compliance vulnerability,High,Low,Mitigated,Dept_3
+RSK-8048,Financial,Sample risk description for financial vulnerability,High,Medium,In Progress,Dept_5
+RSK-8049,Financial,Sample risk description for operational vulnerability,Medium,High,In Progress,Dept_1
+RSK-8050,Cyber,Sample risk description for operational vulnerability,High,High,In Progress,Dept_1
+RSK-8051,Strategic,Sample risk description for strategic vulnerability,High,Low,Mitigated,Dept_4
+RSK-8052,Compliance,Sample risk description for cyber vulnerability,High,Medium,Open,Dept_4
+RSK-8053,Operational,Sample risk description for strategic vulnerability,Low,High,In Progress,Dept_2
+RSK-8054,Financial,Sample risk description for compliance vulnerability,High,High,In Progress,Dept_5
+RSK-8055,Financial,Sample risk description for strategic vulnerability,Low,High,In Progress,Dept_5
+RSK-8056,Cyber,Sample risk description for operational vulnerability,Medium,High,In Progress,Dept_1
+RSK-8057,Financial,Sample risk description for compliance vulnerability,Medium,Medium,Open,Dept_3
+RSK-8058,Cyber,Sample risk description for strategic vulnerability,High,Low,In Progress,Dept_2
+RSK-8059,Strategic,Sample risk description for compliance vulnerability,High,Medium,Mitigated,Dept_3

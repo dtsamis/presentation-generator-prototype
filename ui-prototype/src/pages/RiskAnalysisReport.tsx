@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import pptxgen from 'pptxgenjs';
-import { Download } from 'lucide-react';
+import { Download, Sparkles, Check, X, AlertTriangle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChatWidget from '../components/ChatWidget';
 
@@ -39,6 +39,9 @@ const RiskAnalysisReport = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'unhandled'>>({});
+  
+  const [aiSuggestion, setAiSuggestion] = useState<string>('');
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
 
   const sources: string[] = location.state?.sources || ['risk_matrix.csv'];
 
@@ -49,6 +52,31 @@ const RiskAnalysisReport = () => {
   const handleApproval = (id: string, status: 'approved' | 'rejected' | 'unhandled') => {
     setApprovals(prev => ({ ...prev, [id]: prev[id] === status ? 'unhandled' : status }));
   };
+
+  useEffect(() => {
+    if (!selectedCategory) return;
+    setLoadingSuggestion(true);
+    setAiSuggestion('');
+    
+    // Call our LLM backend
+    fetch('http://localhost:3001/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: `Analyze this risk data for the ${selectedCategory} category: ${JSON.stringify(drillDownData[selectedCategory])}. Provide a single, short paragraph (under 40 words) suggesting exactly one actionable overarching mitigation strategy to reduce this category's risk.`
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      setAiSuggestion(data.reply);
+      setLoadingSuggestion(false);
+    })
+    .catch(e => {
+      console.error(e);
+      setAiSuggestion("Conduct a comprehensive gap analysis and mandate quarterly awareness training for the affected departments.");
+      setLoadingSuggestion(false);
+    });
+  }, [selectedCategory]);
 
   const exportToPPT = () => {
     setIsExporting(true);
@@ -113,7 +141,8 @@ const RiskAnalysisReport = () => {
   const reportContext = JSON.stringify({
     reportType: "Risk Analysis Report Q3 2026",
     summary: riskData,
-    details: drillDownData
+    details: drillDownData,
+    approvals: approvals
   });
 
   return (
@@ -218,8 +247,8 @@ const RiskAnalysisReport = () => {
 
       {/* Deep Dive Section - Dynamically renders based on pie chart clicks */}
       {selectedCategory && (
-        <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-6 animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-6 animate-fade-in flex flex-col gap-6">
+          <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl font-bold text-gray-900 mb-1">{selectedCategory} Risks Breakdown</h2>
               <p className="text-sm text-gray-500">Filtering underlying source data (risk_matrix.csv) for {selectedCategory} category. Needs review.</p>
@@ -275,6 +304,24 @@ const RiskAnalysisReport = () => {
                 </div>
               );
             })}
+          </div>
+
+          {/* AI Suggestion Block */}
+          <div className="bg-gradient-to-r from-slate-50 to-gray-100 border border-slate-200 rounded-xl p-5 flex gap-4 items-start mt-2">
+            <div className="bg-white p-2 text-slate-700 rounded-full shadow-sm border border-slate-200">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-sm mb-1">AI Mitigation Strategy Suggestion</h3>
+              {loadingSuggestion ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+                  Analyzing patterns...
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600 leading-relaxed">{aiSuggestion}</p>
+              )}
+            </div>
           </div>
         </div>
       )}

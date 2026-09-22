@@ -29,13 +29,38 @@ const EmployeeHome = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const generateReport = () => {
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const generateReport = async () => {
     setIsUploading(true);
-    setTimeout(() => {
-      setIsUploading(false);
+    setErrorMessage('');
+    
+    try {
+      let fileContext = "";
+      if (uploadedFiles.length > 0) {
+        const text = await uploadedFiles[0].text();
+        fileContext = text.split('\n').slice(0, 3).join('\n');
+      }
+
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `You are a strict data validator. The user selected report type: '${activeView}'. The uploaded CSV file has this content (headers and sample rows):\n\n${fileContext}\n\nRULES:\n1. If report type is 'upload_fraud', the data MUST have transaction or fraud-related columns (e.g. TransactionID, Amount, Status).\n2. If report type is 'upload_risk', the data MUST have risk-related columns (e.g. RiskID, Category, Likelihood, Mitigation).\n3. If report type is 'upload_general', the data MUST have general metrics (e.g. ProcessID, Revenue, Duration, Users).\n\nIf the data violates the rule for the selected report type, reply EXACTLY with "INVALID: You uploaded the wrong type of data. [Explain briefly]". Otherwise, reply EXACTLY with "VALID".`
+        })
+      });
+
+      const data = await res.json();
+      const aiReply = data.reply || "";
+
+      if (aiReply.toUpperCase().startsWith("INVALID")) {
+        setErrorMessage(aiReply.replace(/INVALID:\s*/i, "").trim());
+        setIsUploading(false);
+        return;
+      }
+      
       const state = { sources: uploadedFiles.map(f => f.name) };
       
-      // Navigate dynamically based on selected view
       if (activeView === 'upload_risk') {
         navigate('/report/risk', { state });
       } else if (activeView === 'upload_fraud') {
@@ -43,7 +68,11 @@ const EmployeeHome = () => {
       } else {
         navigate('/report/general', { state });
       }
-    }, 1500);
+    } catch (e) {
+      console.error(e);
+      setErrorMessage('Failed to validate data with the server. Is the backend running?');
+      setIsUploading(false);
+    }
   };
 
   const renderUploadWindow = (title: string, desc: string) => (
@@ -118,6 +147,14 @@ const EmployeeHome = () => {
             rows={3}
           />
         </div>
+        
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm font-medium animate-fade-in flex items-start gap-3">
+            <ShieldAlert size={18} className="mt-0.5 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
       </div>
 
       <div className="p-6 border-t border-gray-100 bg-gray-50/50">
