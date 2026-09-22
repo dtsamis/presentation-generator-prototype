@@ -1,0 +1,101 @@
+FeedbackID,CustomerID,Date,Category,Sentiment,NPS_Score,Comment
+FDB-20001,CUST-10065,2026-09-10T21:11:17,Transaction Speed,Negative,4,Too many bugs
+FDB-20002,CUST-10088,2026-08-30T23:11:17,App Experience,Positive,9,Secure and reliable
+FDB-20003,CUST-10051,2026-09-17T12:11:17,Account Security,Neutral,6,Average experience
+FDB-20004,CUST-10048,2026-08-27T07:11:17,Account Security,Positive,9,Secure and reliable
+FDB-20005,CUST-10005,2026-08-25T06:11:17,Account Security,Neutral,7,UI is a bit confusing but works
+FDB-20006,CUST-10021,2026-09-08T10:11:17,App Experience,Negative,3,App keeps crashing
+FDB-20007,CUST-10055,2026-08-29T07:11:17,Transaction Speed,Positive,9,Secure and reliable
+FDB-20008,CUST-10050,2026-08-29T19:11:17,App Experience,Positive,8,Support was very helpful
+FDB-20009,CUST-10031,2026-08-24T22:11:17,Customer Service,Neutral,6,UI is a bit confusing but works
+FDB-20010,CUST-10032,2026-09-03T18:11:17,Onboarding,Negative,2,Frustrating experience
+FDB-20011,CUST-10027,2026-08-25T01:11:17,Onboarding,Neutral,6,Fine for basic needs
+FDB-20012,CUST-10043,2026-09-03T08:11:17,Onboarding,Neutral,5,UI is a bit confusing but works
+FDB-20013,CUST-10051,2026-08-25T06:11:17,App Experience,Negative,1,My card was blocked for no reason
+FDB-20014,CUST-10028,2026-08-29T20:11:17,Customer Service,Negative,1,Support was unhelpful
+FDB-20015,CUST-10050,2026-08-29T16:11:17,Customer Service,Neutral,6,Fine for basic needs
+FDB-20016,CUST-10044,2026-08-28T21:11:17,Customer Service,Positive,9,Secure and reliable
+FDB-20017,CUST-10079,2026-09-04T16:11:17,Onboarding,Positive,10,Love the new features
+FDB-20018,CUST-10028,2026-09-16T06:11:17,Onboarding,Positive,9,Secure and reliable
+FDB-20019,CUST-10077,2026-09-05T05:11:17,App Experience,Negative,3,My card was blocked for no reason
+FDB-20020,CUST-10047,2026-09-14T13:11:17,Account Security,Neutral,7,It is okay
+FDB-20021,CUST-10078,2026-09-10T04:11:17,Customer Service,Neutral,7,UI is a bit confusing but works
+FDB-20022,CUST-10075,2026-09-01T21:11:17,App Experience,Negative,4,Support was unhelpful
+FDB-20023,CUST-10044,2026-09-04T09:11:17,Customer Service,Negative,3,Support was unhelpful
+FDB-20024,CUST-10078,2026-08-22T19:11:17,Onboarding,Positive,8,Easy to use
+FDB-20025,CUST-10074,2026-09-14T15:11:17,Transaction Speed,Neutral,6,Does the job
+FDB-20026,CUST-10083,2026-08-23T07:11:17,App Experience,Negative,2,App keeps crashing
+FDB-20027,CUST-10012,2026-09-13T00:11:17,App Experience,Negative,4,Support was unhelpful
+FDB-20028,CUST-10064,2026-09-02T22:11:17,Account Security,Negative,3,My card was blocked for no reason
+FDB-20029,CUST-10029,2026-08-31T02:11:17,Customer Service,Negative,1,Cannot login to my account
+FDB-20030,CUST-10066,2026-09-21T21:11:17,App Experience,Positive,8,Secure and reliable
+FDB-20031,CUST-10017,2026-09-01T03:11:17,Transaction Speed,Positive,9,Super fast transactions
+FDB-20032,CUST-10100,2026-09-02T17:11:17,Customer Service,Neutral,6,Average experience
+FDB-20033,CUST-10063,2026-08-30T04:11:17,App Experience,Positive,8,Secure and reliable
+FDB-20034,CUST-10052,2026-08-31T10:11:17,Onboarding,Neutral,6,UI is a bit confusing but works
+FDB-20035,CUST-10027,2026-09-12T15:11:17,Customer Service,Positive,9,Great app!
+FDB-20036,CUST-10077,2026-09-06T13:11:17,Customer Service,Neutral,6,Does the job
+FDB-20037,CUST-10077,2026-09-15T21:11:17,Onboarding,Negative,2,Cannot login to my account
+FDB-20038,CUST-10086,2026-09-12T16:11:17,Customer Service,Neutral,7,Nothing special
+FDB-20039,CUST-10098,2026-09-19T15:11:17,Account Security,Positive,10,Easy to use
+FDB-20040,CUST-10089,2026-09-18T13:11:17,App Experience,Positive,9,Easy to use
+FDB-20041,CUST-10081,2026-09-21T10:11:17,Onboarding,Positive,8,Super fast transactions
+FDB-20042,CUST-10059,2026-09-18T05:11:17,Customer Service,Neutral,6,UI is a bit confusing but works
+FDB-20043,CUST-10038,2026-09-07T14:11:17,Onboarding,Neutral,5,Nothing special
+FDB-20044,CUST-10079,2026-09-05T13:11:17,Account Security,Neutral,5,UI is a bit confusing but works
+FDB-20045,CUST-10021,2026-09-08T19:11:17,Customer Service,Positive,10,Great app!
+FDB-20046,CUST-10099,2026-08-25T11:11:17,App Experience,Positive,8,Secure and reliable
+FDB-20047,CUST-10012,2026-08-27T15:11:17,App Experience,Negative,1,Cannot login to my account
+FDB-20048,CUST-10012,2026-09-06T03:11:17,Onboarding,Negative,2,Transaction took too long
+FDB-20049,CUST-10089,2026-08-26T20:11:17,App Experience,Positive,9,Super fast transactions
+FDB-20050,CUST-10004,2026-09-18T00:11:17,Account Security,Neutral,5,It is okay
+FDB-20051,CUST-10080,2026-09-08T17:11:17,Onboarding,Negative,2,Frustrating experience
+FDB-20052,CUST-10045,2026-09-09T00:11:17,App Experience,Negative,3,My card was blocked for no reason
+FDB-20053,CUST-10070,2026-09-13T16:11:17,Customer Service,Neutral,5,Does the job
+FDB-20054,CUST-10052,2026-09-15T09:11:17,Onboarding,Neutral,6,It is okay
+FDB-20055,CUST-10092,2026-09-08T10:11:17,Customer Service,Positive,8,Support was very helpful
+FDB-20056,CUST-10069,2026-09-09T14:11:17,Transaction Speed,Negative,2,Frustrating experience
+FDB-20057,CUST-10056,2026-08-28T08:11:17,Transaction Speed,Neutral,7,Fine for basic needs
+FDB-20058,CUST-10008,2026-09-16T12:11:17,Transaction Speed,Negative,1,Too many bugs
+FDB-20059,CUST-10008,2026-09-05T23:11:17,Customer Service,Positive,8,Super fast transactions
+FDB-20060,CUST-10089,2026-09-15T01:11:17,Customer Service,Positive,10,Highly recommend
+FDB-20061,CUST-10096,2026-09-02T23:11:17,Onboarding,Negative,1,Too many bugs
+FDB-20062,CUST-10079,2026-08-29T10:11:17,Customer Service,Neutral,6,Nothing special
+FDB-20063,CUST-10035,2026-09-16T18:11:17,Account Security,Neutral,7,Nothing special
+FDB-20064,CUST-10099,2026-08-26T16:11:17,Account Security,Positive,9,Secure and reliable
+FDB-20065,CUST-10017,2026-09-09T03:11:17,Account Security,Neutral,5,Does the job
+FDB-20066,CUST-10037,2026-08-25T02:11:17,Transaction Speed,Neutral,6,It is okay
+FDB-20067,CUST-10068,2026-09-11T01:11:17,App Experience,Positive,10,Secure and reliable
+FDB-20068,CUST-10035,2026-09-16T22:11:17,Customer Service,Positive,8,Easy to use
+FDB-20069,CUST-10023,2026-08-23T07:11:17,Transaction Speed,Negative,4,Transaction took too long
+FDB-20070,CUST-10015,2026-09-21T07:11:17,Account Security,Positive,8,Great app!
+FDB-20071,CUST-10095,2026-09-10T10:11:17,Transaction Speed,Positive,10,Highly recommend
+FDB-20072,CUST-10076,2026-09-06T22:11:17,Transaction Speed,Neutral,6,It is okay
+FDB-20073,CUST-10001,2026-09-04T08:11:17,Transaction Speed,Positive,8,Secure and reliable
+FDB-20074,CUST-10056,2026-08-28T22:11:17,App Experience,Neutral,7,UI is a bit confusing but works
+FDB-20075,CUST-10071,2026-09-20T02:11:17,Account Security,Negative,4,App keeps crashing
+FDB-20076,CUST-10066,2026-08-25T00:11:17,App Experience,Neutral,7,Does the job
+FDB-20077,CUST-10072,2026-08-28T21:11:17,Customer Service,Negative,3,Cannot login to my account
+FDB-20078,CUST-10041,2026-09-04T14:11:17,Transaction Speed,Positive,9,Great app!
+FDB-20079,CUST-10048,2026-09-08T13:11:17,App Experience,Positive,9,Support was very helpful
+FDB-20080,CUST-10089,2026-08-26T23:11:17,Customer Service,Positive,10,Support was very helpful
+FDB-20081,CUST-10080,2026-09-13T11:11:17,App Experience,Positive,10,Secure and reliable
+FDB-20082,CUST-10021,2026-08-28T18:11:17,Account Security,Positive,9,Highly recommend
+FDB-20083,CUST-10019,2026-08-31T06:11:17,Account Security,Positive,8,Super fast transactions
+FDB-20084,CUST-10055,2026-08-23T17:11:17,Account Security,Positive,9,Great app!
+FDB-20085,CUST-10054,2026-08-23T08:11:17,Transaction Speed,Positive,10,Great app!
+FDB-20086,CUST-10077,2026-09-22T09:11:17,Account Security,Negative,2,Transaction took too long
+FDB-20087,CUST-10038,2026-09-20T23:11:17,Customer Service,Neutral,6,Nothing special
+FDB-20088,CUST-10028,2026-09-09T15:11:17,App Experience,Positive,8,Easy to use
+FDB-20089,CUST-10074,2026-08-28T07:11:17,Account Security,Neutral,6,Fine for basic needs
+FDB-20090,CUST-10007,2026-09-02T09:11:17,Customer Service,Positive,9,Secure and reliable
+FDB-20091,CUST-10011,2026-09-17T04:11:17,App Experience,Negative,1,Support was unhelpful
+FDB-20092,CUST-10058,2026-09-16T10:11:17,Customer Service,Neutral,6,Average experience
+FDB-20093,CUST-10007,2026-08-24T13:11:17,App Experience,Neutral,7,Does the job
+FDB-20094,CUST-10056,2026-09-03T23:11:17,Onboarding,Neutral,5,It is okay
+FDB-20095,CUST-10043,2026-09-01T01:11:17,Account Security,Positive,9,Easy to use
+FDB-20096,CUST-10042,2026-09-09T03:11:17,Account Security,Negative,2,Support was unhelpful
+FDB-20097,CUST-10048,2026-09-03T22:11:17,Transaction Speed,Neutral,7,UI is a bit confusing but works
+FDB-20098,CUST-10073,2026-09-18T04:11:17,App Experience,Positive,9,Support was very helpful
+FDB-20099,CUST-10032,2026-09-06T17:11:17,Account Security,Neutral,6,UI is a bit confusing but works
+FDB-20100,CUST-10055,2026-09-22T11:11:17,App Experience,Neutral,6,Average experience
