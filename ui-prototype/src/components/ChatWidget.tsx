@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, MessageSquare, X } from 'lucide-react';
+import { Send, MessageSquare, X, Bot } from 'lucide-react';
 
 interface ChatMessage {
   id: number;
@@ -32,9 +32,9 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
     if (isOpen) scrollToBottom();
   }, [messages, isTyping, isOpen]);
 
-  // Auto-hide the hint after 8 seconds
+  // Auto-hide the hint after 10 seconds to give them time to read it
   useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 8000);
+    const timer = setTimeout(() => setShowHint(false), 10000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -83,34 +83,48 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
 
   return (
     <>
-      {/* Floating Action Container (Middle Right Edge) */}
-      {!isOpen && (
-        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex items-center">
-          
-          {/* Hint Popup */}
-          {showHint && (
-            <div className="bg-white border border-gray-200 shadow-xl rounded-xl p-4 mr-4 relative max-w-[200px] animate-fade-in">
-              <p className="text-sm text-gray-800 font-medium">Deck generated successfully! 🎉</p>
-              <p className="text-xs text-gray-500 mt-1">Open the Chat Panel for further analysis on this specific data 👉</p>
+      {/* Centered Alert Modal */}
+      {showHint && !isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl p-8 max-w-md w-full relative text-center scale-100">
+            <div className="mx-auto w-16 h-16 bg-blue-50 text-brand-blue rounded-full flex items-center justify-center mb-5 border-4 border-blue-100">
+              <Bot size={32} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Deck generated successfully! 🎉</h2>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              I am your AI Assistant. You can use the <strong>Chat Panel</strong> on the right for further analysis on this specific data.
+            </p>
+            <div className="flex gap-3">
               <button 
-                onClick={() => setShowHint(false)} 
-                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowHint(false)}
+                className="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-200 transition"
               >
-                <X size={14} />
+                Got it
+              </button>
+              <button 
+                onClick={() => { setIsOpen(true); setShowHint(false); }}
+                className="flex-1 bg-brand-blue text-white font-semibold py-3 rounded-xl hover:bg-blue-700 transition shadow-md"
+              >
+                Open Panel
               </button>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
+      {/* Floating Action Button (Middle Right Edge) */}
+      {!isOpen && (
+        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex items-center">
           {/* Button */}
           <button 
             onClick={() => { setIsOpen(true); setShowHint(false); }}
-            className="bg-brand-blue text-white px-3 py-4 rounded-l-xl shadow-2xl hover:bg-blue-700 transition flex flex-col items-center justify-center gap-2 hover:-translate-x-1"
+            className="bg-brand-blue text-white px-4 py-6 rounded-l-2xl shadow-[-4px_0_24px_rgba(0,0,0,0.15)] hover:bg-blue-700 transition flex flex-col items-center justify-center gap-3 hover:-translate-x-1"
           >
             <div className="relative">
-              <MessageSquare size={24} />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-brand-blue rounded-full"></span>
+              <Bot size={32} />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-brand-blue rounded-full"></span>
             </div>
-            <span className="font-semibold text-xs text-center leading-tight">Chat<br/>Panel</span>
+            <span className="font-bold text-sm text-center leading-tight">Chat<br/>Panel</span>
           </button>
         </div>
       )}
@@ -120,7 +134,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
         <div className="fixed right-6 top-1/2 -translate-y-1/2 w-96 h-[550px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden animate-fade-in">
           <div className="bg-brand-blue text-white p-4 flex justify-between items-center shadow-sm z-10">
             <div className="flex items-center gap-2">
-              <MessageSquare size={18} />
+              <Bot size={18} />
               <h3 className="font-semibold text-sm">{title}</h3>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition bg-white/10 rounded p-1">
