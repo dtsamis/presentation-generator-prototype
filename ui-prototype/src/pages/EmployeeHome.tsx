@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Send, FileText, LayoutTemplate, TrendingUp, CalendarClock, MessageSquare } from 'lucide-react';
 
 interface ChatMessage {
@@ -9,8 +10,11 @@ interface ChatMessage {
 }
 
 const EmployeeHome = () => {
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Default mock conversations in history
@@ -42,6 +46,17 @@ const EmployeeHome = () => {
   useEffect(() => {
     scrollToBottom();
   }, [activeChat, isTyping]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setIsUploading(true);
+      // Simulate file upload, processing, and navigating to report
+      setTimeout(() => {
+        setIsUploading(false);
+        navigate('/report');
+      }, 1500);
+    }
+  };
 
   const handleSend = async () => {
     if (!prompt.trim()) return;
@@ -103,12 +118,28 @@ const EmployeeHome = () => {
           <div className="mb-6">
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Quick Actions</h2>
             <div className="grid grid-cols-4 gap-4">
-              <div className="bg-brand-blue rounded-xl p-4 text-white shadow-sm cursor-pointer hover:bg-blue-700 transition">
+              
+              <input 
+                type="file" 
+                accept=".csv,.xlsx" 
+                multiple 
+                hidden 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+              />
+              <div 
+                onClick={() => !isUploading && fileInputRef.current?.click()}
+                className={`rounded-xl p-4 text-white shadow-sm transition ${isUploading ? 'bg-blue-400 cursor-wait' : 'bg-brand-blue cursor-pointer hover:bg-blue-700'}`}
+              >
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mb-6">
-                  <FileText size={18} />
+                  {isUploading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <FileText size={18} />
+                  )}
                 </div>
-                <h3 className="font-semibold text-sm">New Monthly Report</h3>
-                <p className="text-xs text-white/70 mt-1">Upload this period's source data</p>
+                <h3 className="font-semibold text-sm">{isUploading ? 'Processing...' : 'New Monthly Report'}</h3>
+                <p className="text-xs text-white/70 mt-1">{isUploading ? 'Scanning data...' : 'Upload this period\'s source data'}</p>
               </div>
               
               <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition">

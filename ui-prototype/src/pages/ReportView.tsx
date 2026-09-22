@@ -15,10 +15,22 @@ const data = [
 const ReportView = () => {
   return (
     <div className="max-w-6xl mx-auto p-8">
-      {/* Header */}
       <div className="bg-brand-blue text-white rounded-xl p-6 mb-8 shadow-sm">
-        <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
-        <p className="text-sm text-white/80">Compliance · August 2026 · Scheduled report (MOC material)</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
+            <p className="text-sm text-white/80 mb-3">Compliance · August 2026 · Scheduled report (MOC material)</p>
+          </div>
+        </div>
+        <div className="bg-white/10 rounded-lg p-3 inline-block mt-2 border border-white/20">
+          <p className="text-xs font-medium text-white flex items-center gap-2">
+            <span className="uppercase tracking-wider opacity-70">Source Data:</span>
+            <span className="bg-white/20 px-2 py-1 rounded">process_performance.csv</span>
+            <span className="bg-white/20 px-2 py-1 rounded">incidents.csv</span>
+            <span className="bg-white/20 px-2 py-1 rounded">crqs.csv</span>
+            <span className="bg-white/20 px-2 py-1 rounded">risk_matrix.csv</span>
+          </p>
+        </div>
       </div>
 
       {/* Main Slide Content */}
