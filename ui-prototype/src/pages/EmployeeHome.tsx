@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, FileText, LayoutTemplate, TrendingUp, CalendarClock, MessageSquare, Paperclip } from 'lucide-react';
+import { Send, FileText, LayoutTemplate, TrendingUp, CalendarClock, MessageSquare, Paperclip, X } from 'lucide-react';
 
 interface ChatMessage {
   id: number;
@@ -15,6 +15,7 @@ const EmployeeHome = () => {
   const [prompt, setPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Default mock conversations in history
@@ -45,27 +46,42 @@ const EmployeeHome = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [activeChat, isTyping]);
+  }, [activeChat, isTyping, uploadedFiles]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const fileName = e.target.files[0].name.toLowerCase();
-      setIsUploading(true);
-      
-      // Simulate backend analysis of the uploaded data shape
-      setTimeout(() => {
-        setIsUploading(false);
-        // Dynamic routing based on the provided data
-        if (fileName.includes('risk')) {
-          navigate('/report/risk');
-        } else if (fileName.includes('performance') || fileName.includes('process')) {
-          navigate('/report');
-        } else {
-          // Default fallback for demo
-          navigate('/report');
-        }
-      }, 2000);
+      const filesArray = Array.from(e.target.files);
+      setUploadedFiles(prev => [...prev, ...filesArray]);
+      // Reset input so the same file can be selected again if removed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setUploadedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const generateReport = () => {
+    if (uploadedFiles.length === 0) return;
+    
+    setIsUploading(true);
+    const fileName = uploadedFiles[0].name.toLowerCase();
+    
+    // Simulate backend analysis of the uploaded data shape
+    setTimeout(() => {
+      setIsUploading(false);
+      // Dynamic routing based on the provided data
+      if (fileName.includes('risk')) {
+        navigate('/report/risk');
+      } else if (fileName.includes('performance') || fileName.includes('process')) {
+        navigate('/report');
+      } else {
+        // Default fallback for demo
+        navigate('/report');
+      }
+    }, 2000);
   };
 
   const handleSend = async () => {
@@ -204,44 +220,67 @@ const EmployeeHome = () => {
           </div>
 
           <div className="p-4 bg-white border-t">
-            <div className="relative flex items-center">
-              <input 
-                type="file" 
-                accept=".csv,.xlsx" 
-                multiple 
-                hidden 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-              />
-              <button 
-                onClick={() => !isUploading && fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="absolute left-2 w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center transition"
-              >
-                {isUploading ? (
-                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                ) : (
+            {uploadedFiles.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {uploadedFiles.map((file, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-blue-50 text-brand-blue px-3 py-1.5 rounded-full text-xs font-medium border border-blue-100">
+                    <FileText size={12} />
+                    <span className="truncate max-w-[150px]">{file.name}</span>
+                    <button 
+                      onClick={() => removeFile(idx)}
+                      className="hover:bg-blue-200 rounded-full p-0.5 transition"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="relative flex items-center gap-2">
+              <div className="relative flex items-center flex-1">
+                <input 
+                  type="file" 
+                  accept=".csv,.xlsx" 
+                  multiple 
+                  hidden 
+                  ref={fileInputRef} 
+                  onChange={handleFileUpload} 
+                />
+                <button 
+                  onClick={() => !isUploading && fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="absolute left-2 w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center transition"
+                >
                   <Paperclip size={18} />
-                )}
-              </button>
-              <input
-                type="text"
-                placeholder={isUploading ? "Scanning files..." : "Message the assistant..."}
-                className="w-full bg-gray-100 border-transparent rounded-full py-3 pl-12 pr-12 text-sm focus:bg-white focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                disabled={isTyping || isUploading}
-              />
-              <button 
-                onClick={handleSend}
-                disabled={isTyping || !prompt.trim()}
-                className={`absolute right-2 w-8 h-8 rounded-full flex items-center justify-center transition ${
-                  isTyping || !prompt.trim() ? 'bg-gray-300 text-white cursor-not-allowed' : 'bg-brand-blue text-white hover:bg-blue-700'
-                }`}
-              >
-                <Send size={14} className="ml-0.5" />
-              </button>
+                </button>
+                <input
+                  type="text"
+                  placeholder={isUploading ? "Scanning files..." : "Message the assistant or upload data..."}
+                  className="w-full bg-gray-100 border-transparent rounded-full py-3 pl-12 pr-12 text-sm focus:bg-white focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  disabled={isTyping || isUploading}
+                />
+                <button 
+                  onClick={handleSend}
+                  disabled={isTyping || (!prompt.trim() && uploadedFiles.length === 0)}
+                  className={`absolute right-2 w-8 h-8 rounded-full flex items-center justify-center transition ${
+                    isTyping || (!prompt.trim() && uploadedFiles.length === 0) ? 'bg-gray-300 text-white cursor-not-allowed' : 'bg-brand-blue text-white hover:bg-blue-700'
+                  }`}
+                >
+                  <Send size={14} className="ml-0.5" />
+                </button>
+              </div>
+              {uploadedFiles.length > 0 && (
+                <button 
+                  onClick={generateReport}
+                  disabled={isUploading}
+                  className="bg-brand-blue text-white px-4 py-3 rounded-full text-sm font-semibold hover:bg-blue-700 transition flex items-center whitespace-nowrap shadow-sm"
+                >
+                  {isUploading ? 'Scanning...' : 'Generate Deck'}
+                </button>
+              )}
             </div>
           </div>
         </div>
