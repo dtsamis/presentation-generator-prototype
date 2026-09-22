@@ -58,7 +58,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Fast model suitable for chat
+      model: 'gemini-3.6-flash', // Fast model suitable for chat
       contents: userMsg,
       config: {
         systemInstruction: "You are the context-aware Assistant for a bank's Periodic Presentation Generator. You help employees review data, draft presentation narratives, and check compliance. Keep your answers concise, professional, and directly address the user's operational, data, or reporting question.",
