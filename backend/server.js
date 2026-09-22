@@ -61,7 +61,7 @@ app.post('/api/chat', async (req, res) => {
       model: 'gemini-3.6-flash', // Fast model suitable for chat
       contents: userMsg,
       config: {
-        systemInstruction: "You are the context-aware Assistant for a bank's Periodic Presentation Generator. You help employees review data, draft presentation narratives, and check compliance. Keep your answers concise, professional, and directly address the user's operational, data, or reporting question.",
+        systemInstruction: "You are a strict context-aware Assistant for a presentation generator. HARD RULE: You must base all reports and answers ONLY on the context/files provided in the current session. Do not hallucinate, and do not invent irrelevant categories or data not found in the provided context. Keep your answers concise and professional.",
       }
     });
     
