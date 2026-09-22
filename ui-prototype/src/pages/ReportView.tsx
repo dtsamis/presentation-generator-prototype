@@ -6,36 +6,36 @@ import { Download, Sparkles, ShieldAlert, CheckCircle, Clock, AlertTriangle } fr
 import ChatWidget from '../components/ChatWidget';
 
 const data = [
-  { name: 'Week 1', flagged: 400, resolved: 240 },
-  { name: 'Week 2', flagged: 300, resolved: 139 },
-  { name: 'Week 3', flagged: 200, resolved: 980 },
-  { name: 'Week 4', flagged: 278, resolved: 390 },
+  { name: 'Week 1', transactions: 4500, flagged: 120 },
+  { name: 'Week 2', transactions: 5200, flagged: 150 },
+  { name: 'Week 3', transactions: 4800, flagged: 90 },
+  { name: 'Week 4', transactions: 6100, flagged: 210 },
 ];
 
 const barData = [
-  { name: 'NA', resolutionRate: 85 },
-  { name: 'EMEA', resolutionRate: 72 },
-  { name: 'APAC', resolutionRate: 90 },
-  { name: 'LATAM', resolutionRate: 65 },
+  { name: 'NA', trustScore: 88 },
+  { name: 'EMEA', trustScore: 76 },
+  { name: 'APAC', trustScore: 92 },
+  { name: 'LATAM', trustScore: 68 },
 ];
 
-// Mock database mapping regions to specific incidents for drill-down
+// Mock database mapping regions to specific customer anomalies for drill-down
 const drillDownData: Record<string, any[]> = {
   'NA': [
-    { id: 'TRX-8821', type: 'Velocity Check', amount: '$4,200', status: 'Blocked' },
-    { id: 'TRX-8845', type: 'Account Takeover', amount: '$12,500', status: 'Under Review' },
+    { id: 'CUST-10021', segment: 'Premium', trustLevel: 'Low', amount: '$4,200', status: 'Flagged' },
+    { id: 'CUST-10045', segment: 'Corporate', trustLevel: 'Untrusted', amount: '$12,500', status: 'Suspended' },
   ],
   'EMEA': [
-    { id: 'TRX-9011', type: 'Sanctions Match', amount: '€8,100', status: 'Escalated' },
-    { id: 'TRX-9102', type: 'Card Testing', amount: '€45', status: 'Blocked' },
+    { id: 'CUST-10111', segment: 'Retail', trustLevel: 'Low', amount: '€8,100', status: 'Under Review' },
+    { id: 'CUST-10102', segment: 'Guest', trustLevel: 'Untrusted', amount: '€45', status: 'Suspended' },
   ],
   'APAC': [
-    { id: 'TRX-7712', type: 'Geo-mismatch', amount: '¥450,000', status: 'Under Review' }
+    { id: 'CUST-10212', segment: 'Premium', trustLevel: 'Low', amount: '¥450,000', status: 'Under Review' }
   ],
   'LATAM': [
-    { id: 'TRX-6611', type: 'Velocity Check', amount: 'R$1,200', status: 'Blocked' },
-    { id: 'TRX-6623', type: 'Known IP', amount: 'R$8,400', status: 'Escalated' },
-    { id: 'TRX-6655', type: 'Device Fingerprint', amount: 'R$3,100', status: 'Blocked' },
+    { id: 'CUST-10311', segment: 'Retail', trustLevel: 'Untrusted', amount: 'R$1,200', status: 'Suspended' },
+    { id: 'CUST-10323', segment: 'Corporate', trustLevel: 'Low', amount: 'R$8,400', status: 'Flagged' },
+    { id: 'CUST-10355', segment: 'Guest', trustLevel: 'Untrusted', amount: 'R$3,100', status: 'Suspended' },
   ]
 };
 
@@ -133,7 +133,7 @@ const ReportView = () => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
           <div className="bg-green-50 text-green-500 p-3 rounded-lg"><CheckCircle size={24} /></div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Resolved</p>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Trusted Transactions</p>
             <h3 className="text-2xl font-black text-gray-800">1,749</h3>
             <p className="text-xs text-green-600 font-semibold mt-1">Backlog clearing</p>
           </div>
@@ -141,7 +141,7 @@ const ReportView = () => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
           <div className="bg-blue-50 text-brand-blue p-3 rounded-lg"><Clock size={24} /></div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Avg TTR</p>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Avg Trust Score</p>
             <h3 className="text-2xl font-black text-gray-800">14.2h</h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">Time to Resolve</p>
           </div>
@@ -149,7 +149,7 @@ const ReportView = () => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
           <div className="bg-orange-50 text-orange-500 p-3 rounded-lg"><AlertTriangle size={24} /></div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Risk Exposure</p>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Value at Risk</p>
             <h3 className="text-2xl font-black text-gray-800">$1.4M</h3>
             <p className="text-xs text-red-500 font-semibold mt-1">Across 12 open cases</p>
           </div>
@@ -161,7 +161,7 @@ const ReportView = () => {
         
         {/* Chart 1 */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-6">Flagged vs Resolved Transactions (Aug)</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-6">Flagged vs Trusted Transactions Transactions (Aug)</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
@@ -173,7 +173,7 @@ const ReportView = () => {
                 />
                 <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
                 <Line type="monotone" dataKey="flagged" stroke="#EF4444" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
-                <Line type="monotone" dataKey="resolved" stroke="#10B981" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
+                <Line type="monotone" dataKey="Trusted Transactions" stroke="#10B981" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -181,8 +181,8 @@ const ReportView = () => {
 
         {/* Chart 2 */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-1">Regional SLA Compliance (Resolution Rate)</h2>
-          <p className="text-xs text-gray-500 mb-1">Percentage of incidents resolved within the 24-hour Service Level Agreement.</p>
+          <h2 className="text-sm font-semibold text-gray-700 mb-1">Regional Customer Trust Score</h2>
+          <p className="text-xs text-gray-500 mb-1">Percentage of incidents Trusted Transactions within the 24-hour Service Level Agreement.</p>
           <p className="text-xs text-brand-blue mb-4 font-semibold">Click a region bar to drill down into localized incidents</p>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -193,12 +193,12 @@ const ReportView = () => {
                 <RechartsTooltip 
                   cursor={{fill: '#F3F4F6'}}
                   contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
-                  formatter={(value: any) => [`${value}%`, 'Resolution Rate']}
+                  formatter={(value: any) => [`${value}%`, 'Trust Score']}
                 />
                 <Legend iconType="circle" wrapperStyle={{paddingTop: '10px'}} />
                 <Bar 
-                  name="Resolution Rate (%)"
-                  dataKey="resolutionRate" 
+                  name="Trust Score (%)"
+                  dataKey="trustScore" 
                   fill="#3B82F6" 
                   radius={[4, 4, 0, 0]} 
                   onClick={handleBarClick} 
@@ -214,7 +214,7 @@ const ReportView = () => {
       {selectedRegion && (
         <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-6 mb-6 animate-fade-in flex flex-col gap-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-gray-800">Incident Drill-Down: {selectedRegion} Region</h2>
+            <h2 className="text-lg font-bold text-gray-800">Customer Drill-Down: {selectedRegion} Region</h2>
             <button onClick={() => setSelectedRegion(null)} className="text-sm text-brand-blue hover:underline">Close</button>
           </div>
 
@@ -222,24 +222,32 @@ const ReportView = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Incident ID</th>
-                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer ID</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Segment</th>
+                  <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Trust Level</th>
                   <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount at Risk</th>
                   <th className="p-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {currentDrillDown.map((incident: any) => (
-                  <tr key={incident.id} className="hover:bg-gray-50 transition">
-                    <td className="p-3 text-sm font-medium text-brand-blue">{incident.id}</td>
-                    <td className="p-3 text-sm text-gray-700">{incident.type}</td>
-                    <td className="p-3 text-sm text-gray-700">{incident.amount}</td>
+                {currentDrillDown.map((customer: any) => (
+                  <tr key={customer.id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 text-sm font-medium text-brand-blue">{customer.id}</td>
+                    <td className="p-3 text-sm text-gray-700">{customer.segment}</td>
+                    <td className="p-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold
+                        ${customer.trustLevel === 'Untrusted' ? 'bg-red-50 text-red-700 border border-red-100' : 
+                          'bg-orange-50 text-orange-700 border border-orange-100'}`}>
+                        {customer.trustLevel}
+                      </span>
+                    </td>
+                    <td className="p-3 text-sm text-gray-700">{customer.amount}</td>
                     <td className="p-3">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        ${incident.status === 'Blocked' ? 'bg-red-100 text-red-800' : 
-                          incident.status === 'Escalated' ? 'bg-yellow-100 text-yellow-800' : 
+                        ${customer.status === 'Suspended' ? 'bg-red-100 text-red-800' : 
+                          customer.status === 'Flagged' ? 'bg-orange-100 text-orange-800' : 
                           'bg-blue-100 text-blue-800'}`}>
-                        {incident.status}
+                        {customer.status}
                       </span>
                     </td>
                   </tr>
