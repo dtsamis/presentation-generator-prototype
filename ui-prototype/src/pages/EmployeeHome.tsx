@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, FileText, LayoutTemplate, TrendingUp, CalendarClock, MessageSquare } from 'lucide-react';
+import { Send, FileText, LayoutTemplate, TrendingUp, CalendarClock, MessageSquare, Paperclip } from 'lucide-react';
 
 interface ChatMessage {
   id: number;
@@ -119,27 +119,12 @@ const EmployeeHome = () => {
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Quick Actions</h2>
             <div className="grid grid-cols-4 gap-4">
               
-              <input 
-                type="file" 
-                accept=".csv,.xlsx" 
-                multiple 
-                hidden 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-              />
-              <div 
-                onClick={() => !isUploading && fileInputRef.current?.click()}
-                className={`rounded-xl p-4 text-white shadow-sm transition ${isUploading ? 'bg-blue-400 cursor-wait' : 'bg-brand-blue cursor-pointer hover:bg-blue-700'}`}
-              >
+              <div className="bg-brand-blue rounded-xl p-4 text-white shadow-sm cursor-pointer hover:bg-blue-700 transition">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mb-6">
-                  {isUploading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <FileText size={18} />
-                  )}
+                  <FileText size={18} />
                 </div>
-                <h3 className="font-semibold text-sm">{isUploading ? 'Processing...' : 'New Monthly Report'}</h3>
-                <p className="text-xs text-white/70 mt-1">{isUploading ? 'Scanning data...' : 'Upload this period\'s source data'}</p>
+                <h3 className="font-semibold text-sm">New Monthly Report</h3>
+                <p className="text-xs text-white/70 mt-1">Upload this period's source data</p>
               </div>
               
               <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition">
@@ -207,20 +192,39 @@ const EmployeeHome = () => {
           </div>
 
           <div className="p-4 bg-white border-t">
-            <div className="relative">
+            <div className="relative flex items-center">
+              <input 
+                type="file" 
+                accept=".csv,.xlsx" 
+                multiple 
+                hidden 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+              />
+              <button 
+                onClick={() => !isUploading && fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="absolute left-2 w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 flex items-center justify-center transition"
+              >
+                {isUploading ? (
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Paperclip size={18} />
+                )}
+              </button>
               <input
                 type="text"
-                placeholder="Message the assistant..."
-                className="w-full bg-gray-100 border-transparent rounded-full py-3 pl-4 pr-12 text-sm focus:bg-white focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition"
+                placeholder={isUploading ? "Scanning files..." : "Message the assistant..."}
+                className="w-full bg-gray-100 border-transparent rounded-full py-3 pl-12 pr-12 text-sm focus:bg-white focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                disabled={isTyping}
+                disabled={isTyping || isUploading}
               />
               <button 
                 onClick={handleSend}
                 disabled={isTyping || !prompt.trim()}
-                className={`absolute right-2 top-1.5 w-8 h-8 rounded-full flex items-center justify-center transition ${
+                className={`absolute right-2 w-8 h-8 rounded-full flex items-center justify-center transition ${
                   isTyping || !prompt.trim() ? 'bg-gray-300 text-white cursor-not-allowed' : 'bg-brand-blue text-white hover:bg-blue-700'
                 }`}
               >

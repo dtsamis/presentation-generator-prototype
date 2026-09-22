@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
+import pptxgen from 'pptxgenjs';
+import { Download } from 'lucide-react';
 
 const riskData = [
   { name: 'Cyber', value: 3, color: '#EF4444' }, // Red
@@ -9,6 +11,68 @@ const riskData = [
 ];
 
 const RiskAnalysisReport = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportToPPT = () => {
+    setIsExporting(true);
+    let pres = new pptxgen();
+    let slide = pres.addSlide();
+
+    // Slide Title
+    slide.addText("Enterprise Risk Analysis — Q3 2026", {
+      x: 0.5, y: 0.5, w: '90%', h: 0.8,
+      fontSize: 24, bold: true, color: '1E293B'
+    });
+    slide.addText("InfoSec & Compliance · September 2026 · Scheduled report", {
+      x: 0.5, y: 1.2, w: '90%', h: 0.4,
+      fontSize: 12, color: '64748B'
+    });
+
+    // Executive Summary block
+    slide.addShape(pres.ShapeType.rect, {
+      x: 0.5, y: 1.8, w: '40%', h: 3, fill: 'F8FAFC', line: { color: 'E2E8F0' }
+    });
+    slide.addText("Executive Summary", {
+      x: 0.7, y: 2.0, w: '35%', h: 0.3, fontSize: 14, bold: true, color: '1E293B'
+    });
+    
+    const summaryBullets = [
+      { text: "Cyber Threat Increase: Elevated phishing attempts (RSK-0015) targeting Payments staff.", options: { bullet: true, color: '334155' } },
+      { text: "Operational Stability: Manual reconciliation risk (RSK-0009) automated and closed.", options: { bullet: true, color: '334155' } },
+      { text: "IT Infrastructure: Legacy failover gaps (RSK-0017) marked for Q4.", options: { bullet: true, color: '334155' } }
+    ];
+    slide.addText(summaryBullets, { x: 0.7, y: 2.4, w: '36%', h: 2, fontSize: 12 });
+
+    // Critical Open Risks Block
+    slide.addShape(pres.ShapeType.rect, {
+      x: 5.0, y: 1.8, w: '45%', h: 3, fill: 'FEF2F2', line: { color: 'FECACA' }
+    });
+    slide.addText("Critical Open Risks", {
+      x: 5.2, y: 2.0, w: '40%', h: 0.3, fontSize: 14, bold: true, color: '991B1B'
+    });
+    
+    const criticalBullets = [
+      { text: "[RSK-0015] Targeted Phishing (Payments) - High Likelihood, High Impact", options: { bullet: true, color: '7F1D1D', bold: true } },
+      { text: "Highly sophisticated phishing campaigns bypassing tier-1 email filters.", options: { indentLevel: 1, color: '7F1D1D' } },
+      { text: "[RSK-0017] Mobile App Failover Gap - Med Likelihood, High Impact", options: { bullet: true, color: '9A3412', bold: true } },
+      { text: "Secondary active-active database cluster under-provisioned.", options: { indentLevel: 1, color: '9A3412' } }
+    ];
+    slide.addText(criticalBullets, { x: 5.2, y: 2.4, w: '40%', h: 2, fontSize: 11 });
+
+    // Footer
+    slide.addText("Compliance-checked · Audit ID RSK-2026-Q3-001", {
+      x: 0.5, y: 5.2, w: '90%', h: 0.3, fontSize: 9, color: '94A3B8'
+    });
+
+    // Save
+    pres.writeFile({ fileName: "Enterprise_Risk_Analysis_Q3_2026.pptx" })
+      .then(() => setIsExporting(false))
+      .catch((e) => {
+        console.error(e);
+        setIsExporting(false);
+      });
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       {/* Header */}
@@ -18,6 +82,18 @@ const RiskAnalysisReport = () => {
             <h1 className="text-2xl font-bold mb-1">Enterprise Risk Analysis — Q3 2026</h1>
             <p className="text-sm text-slate-300 mb-3">InfoSec & Compliance · September 2026 · Scheduled report</p>
           </div>
+          <button 
+            onClick={exportToPPT}
+            disabled={isExporting}
+            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 border border-slate-500 px-4 py-2 rounded transition text-sm font-medium"
+          >
+            {isExporting ? (
+              <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <Download size={16} />
+            )}
+            {isExporting ? 'Generating PPT...' : 'Export to PPT'}
+          </button>
         </div>
         <div className="bg-slate-700/50 rounded-lg p-3 inline-block mt-2 border border-slate-600">
           <p className="text-xs font-medium text-white flex items-center gap-2">
