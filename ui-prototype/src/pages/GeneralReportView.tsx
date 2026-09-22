@@ -34,22 +34,25 @@ const GeneralReportView = () => {
 
     const generateDynamicLayout = async () => {
       try {
-        const prompt = `You are a dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. DO NOT wrap it in markdown block quotes. ONLY return raw JSON:
+        const prompt = `You are a dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. RETURN ONLY VALID JSON without markdown formatting. Do not include introductory text:
 {
   "kpis": [
-    { "label": "String (e.g. Total Customers)", "value": "String (e.g. 1,450)", "subtext": "String (e.g. +5% vs prev)" } // Exactly 3 KPIs
+    { "label": "String (e.g. Total Responses)", "value": "String (e.g. 1,450)", "subtext": "String (e.g. +5% vs prev)" }
   ],
   "chart1": {
     "title": "String",
-    "data": [ { "name": "Category", "val1": 10 } ], // 3-7 items
+    "data": [ { "name": "Category", "val1": 10 } ],
     "lineKey": "val1"
   },
   "chart2": {
     "title": "String",
-    "data": [ { "name": "Category", "val1": 20, "val2": 15 } ], // 3-7 items
+    "data": [ { "name": "Category", "val1": 20, "val2": 15 } ],
     "barKey1": "val1",
     "barKey2": "val2"
-  }
+  },
+  "insights": [
+    { "title": "String (e.g. Sentiment Shift)", "description": "String (2-3 sentences explaining a pattern)" }
+  ]
 }`;
         const res = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
@@ -57,8 +60,12 @@ const GeneralReportView = () => {
           body: JSON.stringify({ message: prompt })
         });
         const data = await res.json();
-        const jsonStr = data.reply.replace(/```json/g, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(jsonStr);
+        
+        // Extract JSON safely using regex in case the LLM wrapped it in text
+        const jsonMatch = data.reply.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("No JSON object found in response");
+        
+        const parsed = JSON.parse(jsonMatch[0]);
         setDynamicData(parsed);
       } catch (err) {
         console.error("Failed to parse dynamic JSON", err);
@@ -212,6 +219,21 @@ const GeneralReportView = () => {
           </div>
         </div>
       </div>
+
+      {/* Dynamic Insights */}
+      {dynamicData?.insights && dynamicData.insights.length > 0 && (
+        <div className="bg-white p-8 rounded-xl border border-indigo-100 shadow-sm mb-8">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Detected Patterns & Insights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {dynamicData.insights.map((insight: any, idx: number) => (
+              <div key={idx} className="bg-indigo-50/50 p-4 rounded-lg border border-indigo-100">
+                <h3 className="font-semibold text-indigo-900 mb-1">{insight.title}</h3>
+                <p className="text-sm text-indigo-700 leading-relaxed">{insight.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ChatWidget context={reportContext} title={`${dynamicTitle} Assistant`} />
     </div>
