@@ -6,14 +6,14 @@ const EmployeeHome = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [activeView, setActiveView] = useState<'menu' | 'upload_general' | 'upload_fraud' | 'upload_risk'>('menu');
+  const [activeView, setActiveView] = useState<'menu' | 'upload_general' | 'upload_transactions' | 'upload_risk'>('menu');
   const [prompt, setPrompt] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   // Default mock history
   const [history] = useState([
-    { id: 1, text: "Fraud Detection Monthly Review", date: "Sep 22, 2026", type: "fraud" },
+    { id: 1, text: "Transactions Analysis Monthly Review", date: "Sep 22, 2026", type: "transactions" },
     { id: 2, text: "Risk Analysis - InfoSec", date: "Sep 20, 2026", type: "risk" },
     { id: 3, text: "Q3 General Performance", date: "Sep 18, 2026", type: "general" }
   ]);
@@ -46,7 +46,7 @@ const EmployeeHome = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `You are a strict data validator. The user selected report type: '${activeView}'. The uploaded CSV file has this content (headers and sample rows):\n\n${fileContext}\n\nRULES:\n1. If report type is 'upload_fraud', the data MUST have transaction or fraud-related columns (e.g. TransactionID, Amount, Status).\n2. If report type is 'upload_risk', the data MUST have risk-related columns (e.g. RiskID, Category, Likelihood, Mitigation).\n3. If report type is 'upload_general', the data MUST have general metrics (e.g. ProcessID, Revenue, Duration, Users).\n\nIf the data violates the rule for the selected report type, reply EXACTLY with "INVALID: You uploaded the wrong type of data. [Explain briefly]". Otherwise, reply EXACTLY with "VALID".`
+          message: `You are a strict data validator. The user selected report type: '${activeView}'. The uploaded CSV file has this content (headers and sample rows):\n\n${fileContext}\n\nRULES:\n1. If report type is 'upload_transactions', the data MUST have transaction, behavior, or customer-related columns (e.g. TransactionID, Amount, Status).\n2. If report type is 'upload_risk', the data MUST have risk-related columns (e.g. RiskID, Category, Likelihood, Mitigation).\n3. If report type is 'upload_general', the data MUST have general metrics (e.g. ProcessID, Revenue, Duration, Users).\n\nIf the data violates the rule for the selected report type, reply EXACTLY with "INVALID: You uploaded the wrong type of data. [Explain briefly]". Otherwise, reply EXACTLY with "VALID".`
         })
       });
 
@@ -63,7 +63,7 @@ const EmployeeHome = () => {
       
       if (activeView === 'upload_risk') {
         navigate('/report/risk', { state });
-      } else if (activeView === 'upload_fraud') {
+      } else if (activeView === 'upload_transactions') {
         navigate('/report', { state });
       } else {
         navigate('/report/general', { state });
@@ -183,7 +183,7 @@ const EmployeeHome = () => {
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">AI Report & Analysis Generator</h1>
           <p className="text-gray-600 text-lg max-w-3xl leading-relaxed">
-            Transform raw data into interactive, presentation-ready insights. Upload your datasets, add custom instructions, and instantly generate comprehensive dashboards for general metrics, fraud detection, or risk analysis.
+            Transform raw data into interactive, presentation-ready insights. Upload your datasets, add custom instructions, and instantly generate comprehensive dashboards for general metrics, transactions analysis, or risk analysis.
           </p>
         </div>
 
@@ -207,16 +207,16 @@ const EmployeeHome = () => {
                 </div>
               </div>
 
-              {/* Fraud Report */}
+              {/* Transactions Analysis Report */}
               <div 
-                onClick={() => setActiveView('upload_fraud')}
+                onClick={() => setActiveView('upload_transactions')}
                 className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm hover:shadow-xl hover:border-indigo-500 cursor-pointer transition-all flex flex-col gap-4 group"
               >
                 <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition duration-300">
                   <ShieldAlert size={32} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-xl text-gray-800 mb-2">Fraud Report</h3>
+                  <h3 className="font-bold text-xl text-gray-800 mb-2">Transactions Analysis Report</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">Analyze transaction anomalies, regional performance trends, and block statuses.</p>
                 </div>
               </div>
@@ -241,7 +241,7 @@ const EmployeeHome = () => {
 
         {/* Upload Views */}
         {activeView === 'upload_general' && renderUploadWindow('General Report', 'Upload standard metric files for a generic performance deck.')}
-        {activeView === 'upload_fraud' && renderUploadWindow('Fraud Report', 'Upload transaction logs and anomaly files for the fraud detection deck.')}
+        {activeView === 'upload_transactions' && renderUploadWindow('Transactions Analysis Report', 'Upload transaction logs and customer behavior files for the transactions analysis deck.')}
         {activeView === 'upload_risk' && renderUploadWindow('Risk Analysis', 'Upload incident reports and matrices for the interactive risk analysis deck.')}
 
       </div>
@@ -259,7 +259,7 @@ const EmployeeHome = () => {
               className="p-5 border border-gray-100 rounded-2xl hover:bg-blue-50/50 hover:border-blue-100 cursor-pointer transition group shadow-sm hover:shadow"
               onClick={() => {
                 if(item.type === 'risk') navigate('/report/risk');
-                else if (item.type === 'fraud') navigate('/report');
+                else if (item.type === 'transactions') navigate('/report');
                 else navigate('/report/general');
               }}
             >

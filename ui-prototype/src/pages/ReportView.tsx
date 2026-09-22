@@ -45,7 +45,7 @@ const ReportView = () => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  const sources: string[] = location.state?.sources || ['fraud_logs.csv'];
+  const sources: string[] = location.state?.sources || ['customer_transactions.csv'];
 
   const handleBarClick = (data: any) => {
     setSelectedRegion(selectedRegion === data.name ? null : data.name);
@@ -57,12 +57,12 @@ const ReportView = () => {
     
     // Slide 1: Title
     let slide1 = pres.addSlide();
-    slide1.addText("Fraud Detection — Monthly Report", {
+    slide1.addText("Transactions Analysis — Monthly Report", {
       x: 0.5, y: 0.5, w: '90%', h: 0.8,
       fontSize: 24, bold: true, color: '1E293B'
     });
     
-    pres.writeFile({ fileName: "Fraud_Detection_Report.pptx" })
+    pres.writeFile({ fileName: "Transactions_Analysis_Report.pptx" })
       .then(() => setIsExporting(false))
       .catch((e) => {
         console.error(e);
@@ -74,7 +74,7 @@ const ReportView = () => {
   
   // Prepare context data for the ChatWidget
   const reportContext = JSON.stringify({
-    reportType: "Fraud Detection Monthly Report",
+    reportType: "Transactions Analysis Monthly Report",
     weeklyTrends: data,
     regionalPerformance: barData,
     incidentDetails: drillDownData
@@ -86,7 +86,7 @@ const ReportView = () => {
       <div className="bg-brand-blue text-white rounded-xl p-6 mb-6 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
+            <h1 className="text-2xl font-bold mb-1">Transactions Analysis — Monthly Report</h1>
             <p className="text-sm text-white/80 mb-4">Compliance · August 2026 · Scheduled report (MOC material)</p>
           </div>
           <div className="flex gap-3">
@@ -125,7 +125,7 @@ const ReportView = () => {
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
           <div className="bg-red-50 text-red-500 p-3 rounded-lg"><ShieldAlert size={24} /></div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Flagged</p>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Suspicious Txs</p>
             <h3 className="text-2xl font-black text-gray-800">1,178</h3>
             <p className="text-xs text-red-500 font-semibold mt-1">+12% vs prev month</p>
           </div>
@@ -271,7 +271,7 @@ const ReportView = () => {
         </div>
       </div>
       {/* Chat Widget */}
-      <ChatWidget context={reportContext} title="Fraud Report Assistant" />
+      <ChatWidget context={reportContext} title="Transactions Analysis Report Assistant" />
     </div>
   );
 };
