@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import pptxgen from 'pptxgenjs';
-import { Download, Sparkles } from 'lucide-react';
+import { Download, Sparkles, ShieldAlert, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import ChatWidget from '../components/ChatWidget';
 
 const data = [
@@ -13,10 +13,10 @@ const data = [
 ];
 
 const barData = [
-  { name: 'NA', performance: 85 },
-  { name: 'EMEA', performance: 72 },
-  { name: 'APAC', performance: 90 },
-  { name: 'LATAM', performance: 65 },
+  { name: 'NA', resolutionRate: 85 },
+  { name: 'EMEA', resolutionRate: 72 },
+  { name: 'APAC', resolutionRate: 90 },
+  { name: 'LATAM', resolutionRate: 65 },
 ];
 
 // Mock database mapping regions to specific incidents for drill-down
@@ -110,7 +110,7 @@ const ReportView = () => {
   return (
     <div className="max-w-6xl mx-auto p-8 pb-20">
       {/* Header */}
-      <div className="bg-brand-blue text-white rounded-xl p-6 mb-8 shadow-sm">
+      <div className="bg-brand-blue text-white rounded-xl p-6 mb-6 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
@@ -147,6 +147,42 @@ const ReportView = () => {
         </div>
       </div>
 
+      {/* Top Level KPIs */}
+      <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+          <div className="bg-red-50 text-red-500 p-3 rounded-lg"><ShieldAlert size={24} /></div>
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Flagged</p>
+            <h3 className="text-2xl font-black text-gray-800">1,178</h3>
+            <p className="text-xs text-red-500 font-semibold mt-1">+12% vs prev month</p>
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+          <div className="bg-green-50 text-green-500 p-3 rounded-lg"><CheckCircle size={24} /></div>
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Resolved</p>
+            <h3 className="text-2xl font-black text-gray-800">1,749</h3>
+            <p className="text-xs text-green-600 font-semibold mt-1">Backlog clearing</p>
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+          <div className="bg-blue-50 text-brand-blue p-3 rounded-lg"><Clock size={24} /></div>
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Avg TTR</p>
+            <h3 className="text-2xl font-black text-gray-800">14.2h</h3>
+            <p className="text-xs text-gray-500 font-semibold mt-1">Time to Resolve</p>
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-start gap-4">
+          <div className="bg-orange-50 text-orange-500 p-3 rounded-lg"><AlertTriangle size={24} /></div>
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Risk Exposure</p>
+            <h3 className="text-2xl font-black text-gray-800">$1.4M</h3>
+            <p className="text-xs text-red-500 font-semibold mt-1">Across 12 open cases</p>
+          </div>
+        </div>
+      </div>
+
       {/* Grid Layout for Charts */}
       <div className="grid grid-cols-2 gap-8 mb-8">
         
@@ -172,9 +208,10 @@ const ReportView = () => {
 
         {/* Chart 2 */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Process Performance by Region</h2>
-          <p className="text-xs text-brand-blue mb-4">Click a region bar to drill down into localized incidents</p>
-          <div className="h-64">
+          <h2 className="text-sm font-semibold text-gray-700 mb-1">Regional SLA Compliance (Resolution Rate)</h2>
+          <p className="text-xs text-gray-500 mb-1">Percentage of incidents resolved within the 24-hour Service Level Agreement.</p>
+          <p className="text-xs text-brand-blue mb-4 font-semibold">Click a region bar to drill down into localized incidents</p>
+          <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData} barSize={40}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
@@ -183,14 +220,16 @@ const ReportView = () => {
                 <RechartsTooltip 
                   cursor={{fill: '#F3F4F6'}}
                   contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
+                  formatter={(value: any) => [`${value}%`, 'Resolution Rate']}
                 />
-                <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
+                <Legend iconType="circle" wrapperStyle={{paddingTop: '10px'}} />
                 <Bar 
-                  dataKey="performance" 
+                  name="Resolution Rate (%)"
+                  dataKey="resolutionRate" 
                   fill="#3B82F6" 
                   radius={[4, 4, 0, 0]} 
-                  onClick={handleBarClick}
-                  className="cursor-pointer hover:opacity-80 transition"
+                  onClick={handleBarClick} 
+                  className="cursor-pointer hover:opacity-80 transition" 
                 />
               </BarChart>
             </ResponsiveContainer>
