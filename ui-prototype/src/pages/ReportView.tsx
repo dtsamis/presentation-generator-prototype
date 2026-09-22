@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation } from 'react-router-dom';
+import ChatWidget from '../components/ChatWidget';
 
 const data = [
   { name: 'Week 1', flagged: 400, resolved: 240 },
@@ -47,6 +48,14 @@ const ReportView = () => {
   };
 
   const currentDrillDown = selectedRegion ? drillDownData[selectedRegion] : [];
+  
+  // Prepare context data for the ChatWidget
+  const reportContext = JSON.stringify({
+    reportType: "Fraud Detection Monthly Report",
+    weeklyTrends: data,
+    regionalPerformance: barData,
+    incidentDetails: drillDownData
+  });
 
   return (
     <div className="max-w-6xl mx-auto p-8 pb-20">
@@ -166,6 +175,8 @@ const ReportView = () => {
           </div>
         </div>
       </div>
+      {/* Chat Widget */}
+      <ChatWidget context={reportContext} title="Fraud Report Assistant" />
     </div>
   );
 };

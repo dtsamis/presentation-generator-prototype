@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, L
 import pptxgen from 'pptxgenjs';
 import { Download } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import ChatWidget from '../components/ChatWidget';
 
 const riskData = [
   { name: 'Cyber', value: 3, color: '#EF4444' }, // Red
@@ -106,6 +107,13 @@ const RiskAnalysisReport = () => {
   };
 
   const currentDrillDown = selectedCategory ? drillDownData[selectedCategory] : [];
+  
+  // Prepare context data for the ChatWidget
+  const reportContext = JSON.stringify({
+    reportType: "Risk Analysis Report Q3 2026",
+    summary: riskData,
+    details: drillDownData
+  });
 
   return (
     <div className="max-w-6xl mx-auto p-8 pb-20">
@@ -253,6 +261,8 @@ const RiskAnalysisReport = () => {
           </div>
         </div>
       )}
+      {/* Chat Widget */}
+      <ChatWidget context={reportContext} title="Risk Report Assistant" />
     </div>
   );
 };
