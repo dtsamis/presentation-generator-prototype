@@ -33,6 +33,42 @@ const drillDownData: Record<string, any[]> = {
   ]
 };
 
+const MiniRiskMatrix = ({ likelihood, impact }: { likelihood: string, impact: string }) => {
+  const levels = ['High', 'Med', 'Low'];
+  const impacts = ['Low', 'Med', 'High'];
+  
+  const getCellColor = (l: string, i: string, isMatch: boolean) => {
+    if (!isMatch) return 'bg-slate-100 border-white';
+    if (l === 'High' && i === 'High') return 'bg-red-500 shadow-md ring-1 ring-red-600';
+    if ((l === 'High' && i === 'Med') || (l === 'Med' && i === 'High')) return 'bg-orange-500 shadow-md ring-1 ring-orange-600';
+    if (l === 'Low' && i === 'Low') return 'bg-green-500 shadow-md ring-1 ring-green-600';
+    if ((l === 'Low' && i === 'Med') || (l === 'Med' && i === 'Low')) return 'bg-green-400 shadow-md ring-1 ring-green-500';
+    return 'bg-yellow-400 shadow-md ring-1 ring-yellow-500'; 
+  };
+
+  return (
+    <div className="flex flex-col items-center bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm">
+      <div className="text-[8px] font-bold text-slate-400 mb-1 tracking-widest uppercase">Matrix</div>
+      <div className="flex flex-col gap-[2px]">
+        {levels.map(l => (
+          <div key={l} className="flex gap-[2px]">
+            {impacts.map(i => {
+              const isMatch = likelihood === l && impact === i;
+              return (
+                <div 
+                  key={`${l}-${i}`}
+                  title={`Likelihood: ${l}, Impact: ${i}`}
+                  className={`w-4 h-4 border border-slate-200 rounded-[2px] transition-all duration-300 ${getCellColor(l, i, isMatch)} ${isMatch ? 'scale-110 z-10' : ''}`}
+                />
+              )
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const RiskAnalysisReport = () => {
   const location = useLocation();
   const [isExporting, setIsExporting] = useState(false);
@@ -201,13 +237,13 @@ const RiskAnalysisReport = () => {
         <div className="bg-slate-100 border-t border-slate-200 px-8 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-slate-600 px-2 py-0.5 rounded">Quarter-over-Quarter</span>
-            <span className="text-sm text-slate-800">+1 Critical Cyber Risk · -2 Operational Risks</span>
+            <span className="text-sm text-slate-800">+1 Critical Cyber Risk • -2 Operational Risks</span>
           </div>
-          <span className="text-xs text-slate-500">Compliance-checked · Audit ID RSK-2026-Q3-001</span>
+          <span className="text-xs text-slate-500">Compliance-checked • Audit ID RSK-2026-Q3-001</span>
         </div>
       </div>
 
-    // Deep Dive Section - Dynamically renders based on pie chart clicks
+      {/* Deep Dive Section - Dynamically renders based on pie chart clicks */}
       {selectedCategory && (
         <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-6 animate-fade-in">
           <div className="flex justify-between items-center mb-6">
@@ -222,34 +258,38 @@ const RiskAnalysisReport = () => {
             {currentDrillDown.map(item => {
               const status = approvals[item.id] || 'pending';
               return (
-                <div key={item.id} className={`border rounded-lg p-5 transition ${
+                <div key={item.id} className={`border rounded-xl p-5 transition relative overflow-hidden ${
                   status === 'approved' ? 'border-green-300 bg-green-50/50' : 
                   status === 'rejected' ? 'border-red-300 bg-red-50/50' : 
                   'border-gray-200 bg-gray-50/50'
                 }`}>
                   <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded">{item.id}</span>
-                    <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
+                    <div>
+                      <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded mr-2">{item.id}</span>
+                      <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
+                    </div>
+                    {/* The Mini Risk Matrix for this specific record */}
+                    <MiniRiskMatrix likelihood={item.likelihood} impact={item.impact} />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mt-2 mb-2">{item.name}</h3>
-                  <p className="text-sm text-gray-700 mb-4">{item.desc}</p>
+                  <h3 className="font-semibold text-gray-900 mt-1 mb-2 pr-12">{item.name}</h3>
+                  <p className="text-sm text-gray-700 mb-5">{item.desc}</p>
                   <div className="flex justify-between items-end">
                     <div className="flex gap-2">
-                      <span className={`text-xs px-2 py-1 rounded ${item.likelihood === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>Likelihood: {item.likelihood}</span>
-                      <span className={`text-xs px-2 py-1 rounded ${item.impact === 'High' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>Impact: {item.impact}</span>
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${item.likelihood === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>Likelihood: {item.likelihood}</span>
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${item.impact === 'High' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>Impact: {item.impact}</span>
                     </div>
                     
                     {/* Inline Approval Controls */}
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleApproval(item.id, 'approved')}
-                        className={`text-xs px-3 py-1.5 rounded transition ${status === 'approved' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'approved' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
                       >
                         Approve
                       </button>
                       <button 
                         onClick={() => handleApproval(item.id, 'rejected')}
-                        className={`text-xs px-3 py-1.5 rounded transition ${status === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                        className={`text-xs px-3 py-1.5 rounded transition font-medium ${status === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
                       >
                         Reject
                       </button>
