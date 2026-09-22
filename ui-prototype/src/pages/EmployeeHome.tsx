@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, ShieldAlert, BarChart3, Upload, X, PlayCircle, Clock, ChevronLeft } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const EmployeeHome = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const EmployeeHome = () => {
   const [prompt, setPrompt] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Default mock history
   const [history] = useState([
@@ -29,8 +31,6 @@ const EmployeeHome = () => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const [errorMessage, setErrorMessage] = useState('');
-
   const generateReport = async () => {
     setIsUploading(true);
     setErrorMessage('');
@@ -39,7 +39,16 @@ const EmployeeHome = () => {
       let fileContext = "";
       let fullText = "";
       if (uploadedFiles.length > 0) {
-        fullText = await uploadedFiles[0].text();
+        const file = uploadedFiles[0];
+        if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+          const buffer = await file.arrayBuffer();
+          const wb = XLSX.read(buffer, { type: 'array' });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          fullText = XLSX.utils.sheet_to_csv(ws);
+        } else {
+          fullText = await file.text();
+        }
         fileContext = fullText.split('\n').slice(0, 3).join('\n');
       }
 
