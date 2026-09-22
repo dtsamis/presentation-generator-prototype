@@ -1,34 +1,73 @@
-import React, { useState } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import pptxgen from 'pptxgenjs';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import ChatWidget from '../components/ChatWidget';
 
-const performanceData = [
+const fallbackPerformanceData = [
   { name: 'Jan', revenue: 4000, target: 2400 },
   { name: 'Feb', revenue: 3000, target: 1398 },
-  { name: 'Mar', revenue: 2000, target: 9800 },
-  { name: 'Apr', revenue: 2780, target: 3908 },
-  { name: 'May', revenue: 1890, target: 4800 },
-  { name: 'Jun', revenue: 2390, target: 3800 },
-  { name: 'Jul', revenue: 3490, target: 4300 },
+  { name: 'Mar', revenue: 2000, target: 9800 }
 ];
-
-const metricData = [
+const fallbackMetricData = [
   { name: 'Q1', growth: 85, attrition: 15 },
-  { name: 'Q2', growth: 72, attrition: 18 },
-  { name: 'Q3', growth: 90, attrition: 10 },
-  { name: 'Q4', growth: 65, attrition: 22 },
+  { name: 'Q2', growth: 72, attrition: 18 }
 ];
 
 const GeneralReportView = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isExporting, setIsExporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dynamicData, setDynamicData] = useState<any>(null);
 
-  const sources: string[] = location.state?.sources || ['performance_metrics_q3.xlsx'];
+  const sources: string[] = location.state?.sources || ['uploaded_file.csv'];
   const dynamicTitle = location.state?.reportTitle || "General Performance Report";
+  const fileData = location.state?.fileData || "";
+
+  useEffect(() => {
+    if (!fileData) {
+      setIsLoading(false);
+      return;
+    }
+
+    const generateDynamicLayout = async () => {
+      try {
+        const prompt = `You are a dashboard generator. Based on this CSV data snippet:\n\n${fileData}\n\nGenerate a JSON object strictly matching this schema. DO NOT wrap it in markdown block quotes. ONLY return raw JSON:
+{
+  "kpis": [
+    { "label": "String (e.g. Total Customers)", "value": "String (e.g. 1,450)", "subtext": "String (e.g. +5% vs prev)" } // Exactly 3 KPIs
+  ],
+  "chart1": {
+    "title": "String",
+    "data": [ { "name": "Category", "val1": 10 } ], // 3-7 items
+    "lineKey": "val1"
+  },
+  "chart2": {
+    "title": "String",
+    "data": [ { "name": "Category", "val1": 20, "val2": 15 } ], // 3-7 items
+    "barKey1": "val1",
+    "barKey2": "val2"
+  }
+}`;
+        const res = await fetch('http://localhost:3001/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt })
+        });
+        const data = await res.json();
+        const jsonStr = data.reply.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(jsonStr);
+        setDynamicData(parsed);
+      } catch (err) {
+        console.error("Failed to parse dynamic JSON", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    generateDynamicLayout();
+  }, [fileData]);
 
   const exportToPPT = () => {
     setIsExporting(true);
@@ -50,39 +89,9 @@ const GeneralReportView = () => {
     let slide2 = pres.addSlide();
     slide2.addText("Executive Summary", { x: 0.5, y: 0.5, w: '90%', fontSize: 24, bold: true, color: '1E293B' });
     slide2.addText([
-      { text: "Strong overall performance driven by Q3 metrics.", options: { bullet: true } },
-      { text: "Revenue targets met or exceeded in 5 out of 7 months.", options: { bullet: true } },
-      { text: "Attrition remains a key area for operational improvement.", options: { bullet: true } },
-      { text: "Overall Growth trend continues to rise year-over-year.", options: { bullet: true } }
+      { text: `Metrics for ${dynamicTitle} show solid performance.`, options: { bullet: true } },
+      { text: "Detailed breakdowns align with expected variations.", options: { bullet: true } }
     ], { x: 0.5, y: 1.2, w: '80%', h: 3, fontSize: 18, color: '334155' });
-    
-    // Slide 3: Detailed Metrics
-    let slide3 = pres.addSlide();
-    slide3.addText("Quarterly Metrics Breakdown", { x: 0.5, y: 0.5, w: '90%', fontSize: 24, bold: true, color: '1E293B' });
-    
-    const tableRows: any[] = [
-      [{ text: "Quarter", options: { bold: true } }, { text: "Growth (%)", options: { bold: true } }, { text: "Attrition (%)", options: { bold: true } }],
-      ["Q1", "85%", "15%"],
-      ["Q2", "72%", "18%"],
-      ["Q3", "90%", "10%"],
-      ["Q4", "65%", "22%"]
-    ];
-    
-    slide3.addTable(tableRows, {
-      x: 0.5, y: 1.5, w: 7,
-      border: { pt: 1, color: "E2E8F0" },
-      fill: "F1F5F9",
-      color: "334155",
-      fontSize: 14
-    });
-
-    // Slide 4: Key Insights & Recommendations
-    let slide4 = pres.addSlide();
-    slide4.addText("Insights & Strategic Recommendations", { x: 0.5, y: 0.5, w: '90%', fontSize: 24, bold: true, color: '1E293B' });
-    slide4.addText([
-      { text: "Focus resource allocation on Q4 to mitigate expected seasonal attrition.", options: { bullet: true, color: '0F172A' } },
-      { text: "Investigate Q3 growth drivers to replicate success across slower periods.", options: { bullet: true, color: '0F172A' } }
-    ], { x: 0.5, y: 1.5, w: '80%', fontSize: 16, color: '334155' });
     
     pres.writeFile({ fileName: `${dynamicTitle.replace(/\s+/g, '_')}.pptx` })
       .then(() => setIsExporting(false))
@@ -92,12 +101,39 @@ const GeneralReportView = () => {
       });
   };
 
-  // Prepare context data for the ChatWidget
   const reportContext = JSON.stringify({
     reportType: dynamicTitle,
-    timeline: performanceData,
-    quarterlyMetrics: metricData
+    dataPreview: dynamicData || "No parsed data available"
   });
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+        <h2 className="text-xl font-bold text-gray-800 animate-pulse">Analyzing file structure & generating dynamic dashboard...</h2>
+      </div>
+    );
+  }
+
+  // Use dynamic data or fallback to a basic placeholder if LLM failed
+  const kpis = dynamicData?.kpis || [
+    { label: "Data Rows", value: "Loaded", subtext: "Processed properly" },
+    { label: "Format", value: "CSV", subtext: "Standard tabular" },
+    { label: "Status", value: "Active", subtext: "Live session" }
+  ];
+  
+  const chart1 = dynamicData?.chart1 || {
+    title: "Primary Trend",
+    data: fallbackPerformanceData,
+    lineKey: "revenue"
+  };
+
+  const chart2 = dynamicData?.chart2 || {
+    title: "Category Distribution",
+    data: fallbackMetricData,
+    barKey1: "growth",
+    barKey2: "attrition"
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-8 pb-20">
@@ -118,92 +154,66 @@ const GeneralReportView = () => {
             <button 
               onClick={exportToPPT}
               disabled={isExporting}
-              className="flex items-center gap-2 bg-white text-indigo-900 hover:bg-gray-100 px-4 py-2 rounded transition text-sm font-medium shadow-sm"
+              className="flex items-center gap-2 bg-white text-indigo-900 hover:bg-indigo-50 px-4 py-2 rounded font-semibold transition"
             >
-              {isExporting ? (
-                <div className="w-4 h-4 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <Download size={16} />
-              )}
-              {isExporting ? 'Generating PPT...' : 'Export to PPT'}
+              {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download size={18} />}
+              Export to PPT
             </button>
           </div>
         </div>
-        <div className="bg-white/10 rounded-lg p-3 inline-block border border-white/20 mt-2">
-          <p className="text-xs font-medium text-white/90 flex items-center gap-2">
-            <span className="uppercase tracking-wider text-white/60">Source Data:</span>
-            {sources.map(src => (
-              <span key={src} className="bg-white/20 px-2 py-1 rounded">{src}</span>
-            ))}
-          </p>
-        </div>
       </div>
 
+      {/* Dynamic KPIs */}
       <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center">
-           <p className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">YTD Revenue</p>
-           <h3 className="text-3xl font-bold text-gray-800">$14.2M</h3>
-           <p className="text-xs text-green-600 font-medium mt-2">+12% vs last year</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center">
-           <p className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">Active Users</p>
-           <h3 className="text-3xl font-bold text-gray-800">124,500</h3>
-           <p className="text-xs text-green-600 font-medium mt-2">+4% vs last quarter</p>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center">
-           <p className="text-sm text-gray-500 font-medium uppercase tracking-wider mb-1">Avg Conversion</p>
-           <h3 className="text-3xl font-bold text-gray-800">4.2%</h3>
-           <p className="text-xs text-red-500 font-medium mt-2">-0.5% vs last month</p>
-        </div>
+        {kpis.map((kpi: any, idx: number) => (
+          <div key={idx} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-center">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{kpi.label}</p>
+            <h3 className="text-3xl font-black text-gray-800 mb-1">{kpi.value}</h3>
+            <p className="text-sm font-medium text-green-600">{kpi.subtext}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Grid Layout for Charts */}
+      {/* Dynamic Charts Grid */}
       <div className="grid grid-cols-2 gap-8 mb-8">
         
-        {/* Chart 1 */}
+        {/* Dynamic Line Chart */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-6">Revenue vs Target (YTD)</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-6">{chart1.title}</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={performanceData}>
+              <LineChart data={chart1.data}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                <RechartsTooltip 
-                  contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
-                />
+                <RechartsTooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
                 <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
-                <Area type="monotone" dataKey="revenue" stroke="#4F46E5" fill="#EEF2FF" strokeWidth={3} />
-                <Area type="monotone" dataKey="target" stroke="#9CA3AF" fill="transparent" strokeWidth={2} strokeDasharray="4 4" />
-              </AreaChart>
+                <Line type="monotone" dataKey={chart1.lineKey} stroke="#4F46E5" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Chart 2 */}
+        {/* Dynamic Bar Chart */}
         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-700 mb-6">Quarterly Growth vs Attrition</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-6">{chart2.title}</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={metricData} barSize={40}>
+              <BarChart data={chart2.data} barSize={40}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
-                <RechartsTooltip 
-                  cursor={{fill: '#F3F4F6'}}
-                  contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
-                />
-                <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
-                <Bar dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="attrition" fill="#F43F5E" radius={[4, 4, 0, 0]} />
+                <RechartsTooltip cursor={{fill: '#F3F4F6'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                <Legend iconType="circle" wrapperStyle={{paddingTop: '10px'}} />
+                <Bar name={chart2.barKey1} dataKey={chart2.barKey1} fill="#10B981" radius={[4, 4, 0, 0]} />
+                {chart2.barKey2 && <Bar name={chart2.barKey2} dataKey={chart2.barKey2} fill="#F43F5E" radius={[4, 4, 0, 0]} />}
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Chat Widget */}
-      <ChatWidget context={reportContext} title="General Report Assistant" />
+      <ChatWidget context={reportContext} title={`${dynamicTitle} Assistant`} />
     </div>
   );
 };

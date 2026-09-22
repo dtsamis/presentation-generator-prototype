@@ -37,9 +37,10 @@ const EmployeeHome = () => {
     
     try {
       let fileContext = "";
+      let fullText = "";
       if (uploadedFiles.length > 0) {
-        const text = await uploadedFiles[0].text();
-        fileContext = text.split('\n').slice(0, 3).join('\n');
+        fullText = await uploadedFiles[0].text();
+        fileContext = fullText.split('\n').slice(0, 3).join('\n');
       }
 
       const res = await fetch('http://localhost:3001/api/chat', {
@@ -64,7 +65,8 @@ const EmployeeHome = () => {
         reportTitle = aiReply.replace(/VALID:\s*/i, "").trim();
       }
       
-      const state = { sources: uploadedFiles.map(f => f.name), reportTitle };
+      const fileData = fullText ? fullText.split('\n').slice(0, 50).join('\n') : "";
+      const state = { sources: uploadedFiles.map(f => f.name), reportTitle, fileData };
       
       if (activeView === 'upload_risk') {
         navigate('/report/risk', { state });
