@@ -49,6 +49,7 @@ app.get('/api/flagged', (req, res) => {
 // Live LLM Chat Endpoint
 app.post('/api/chat', async (req, res) => {
   const userMsg = req.body.message;
+  const customSystemInstruction = req.body.systemInstruction;
   
   if (!ai) {
     return res.json({ 
@@ -61,7 +62,7 @@ app.post('/api/chat', async (req, res) => {
       model: 'gemini-3.6-flash', // Fast model suitable for chat
       contents: userMsg,
       config: {
-        systemInstruction: "You are a strict context-aware Assistant for a presentation generator. HARD RULE: You must base all reports and answers ONLY on the context/files provided in the current session. Do not hallucinate, and do not invent irrelevant categories or data not found in the provided context. Keep your answers concise and professional.",
+        systemInstruction: customSystemInstruction || "You are a strict context-aware Assistant for a presentation generator. HARD RULE: You must base all reports and answers ONLY on the context/files provided in the current session. Do not hallucinate, and do not invent irrelevant categories or data not found in the provided context. Keep your answers concise and professional.",
       }
     });
     

@@ -57,13 +57,17 @@ const GeneralReportView = () => {
         const res = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: prompt })
+          body: JSON.stringify({ 
+            message: prompt,
+            systemInstruction: "You are a data analyzer. You MUST output ONLY valid JSON matching the schema. It is OK to synthesize KPI titles and insights based on the data. Do NOT include markdown blocks."
+          })
         });
         const data = await res.json();
+        console.log("Raw LLM Reply:", data.reply);
         
         // Extract JSON safely using regex in case the LLM wrapped it in text
         const jsonMatch = data.reply.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error("No JSON object found in response");
+        if (!jsonMatch) throw new Error("No JSON object found in response. Raw reply: " + data.reply);
         
         const parsed = JSON.parse(jsonMatch[0]);
         setDynamicData(parsed);
