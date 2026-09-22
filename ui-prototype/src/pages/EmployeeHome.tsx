@@ -60,6 +60,12 @@ const EmployeeHome = () => {
         })
       });
 
+      if (res.status === 429) {
+        setErrorMessage("API Quota Exceeded. Please wait 1 minute before generating another report.");
+        setIsUploading(false);
+        return;
+      }
+
       const data = await res.json();
       const aiReply = data.reply || "";
 

@@ -1,0 +1,6 @@
+const { GoogleGenAI } = require('@google/genai');
+require('dotenv').config();
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const fileContext = 'CustomerID,Feedback\nCUST-9001,The mortgage application resulted in hidden fees.\n';
+const prompt = 'You are a dashboard generator. Based on this CSV data snippet:\n\n' + fileContext + '\n\nGenerate a JSON object strictly matching this schema. RETURN ONLY VALID JSON without markdown formatting. Do not include introductory text:\n{\n  \"kpis\": [\n    { \"label\": \"String\", \"value\": \"String\", \"subtext\": \"String\" }\n  ],\n  \"chart1\": {\n    \"title\": \"String\",\n    \"data\": [ { \"name\": \"Category\", \"val1\": 10 } ],\n    \"lineKey\": \"val1\"\n  },\n  \"chart2\": {\n    \"title\": \"String\",\n    \"data\": [ { \"name\": \"Category\", \"val1\": 20, \"val2\": 15 } ],\n    \"barKey1\": \"val1\",\n    \"barKey2\": \"val2\"\n  },\n  \"insights\": [\n    { \"title\": \"String\", \"description\": \"String\" }\n  ]\n}';
+ai.models.generateContent({ model: 'gemini-3.6-flash', contents: prompt, config: { systemInstruction: 'You are a data analyzer. You MUST output ONLY valid JSON matching the schema. It is OK to synthesize KPI titles and insights based on the data. Do NOT include markdown blocks.' } }).then(r => console.log('REPLY:', r.text)).catch(console.error);

@@ -62,6 +62,12 @@ const GeneralReportView = () => {
             systemInstruction: "You are a data analyzer. You MUST output ONLY valid JSON matching the schema. It is OK to synthesize KPI titles and insights based on the data. Do NOT include markdown blocks."
           })
         });
+
+        if (res.status === 429) {
+          setDynamicData({ rateLimit: true });
+          return;
+        }
+
         const data = await res.json();
         console.log("Raw LLM Reply:", data.reply);
         
@@ -122,6 +128,16 @@ const GeneralReportView = () => {
       <div className="max-w-6xl mx-auto p-8 flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
         <h2 className="text-xl font-bold text-gray-800 animate-pulse">Analyzing file structure & generating dynamic dashboard...</h2>
+      </div>
+    );
+  }
+
+  if (dynamicData?.rateLimit) {
+    return (
+      <div className="max-w-4xl mx-auto mt-20 p-8 flex flex-col items-center justify-center text-center bg-red-50 border-2 border-red-200 rounded-2xl">
+        <h2 className="text-2xl font-bold text-red-700 mb-2">API Rate Limit Exceeded</h2>
+        <p className="text-red-600 mb-6">We've hit the Gemini Free Tier limit of 20 requests per minute. Please wait 1 minute before trying again.</p>
+        <button onClick={() => navigate('/')} className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition">Go Back</button>
       </div>
     );
   }
