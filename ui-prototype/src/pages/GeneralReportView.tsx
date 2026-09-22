@@ -60,7 +60,7 @@ const GeneralReportView = () => {
     let slide3 = pres.addSlide();
     slide3.addText("Quarterly Metrics Breakdown", { x: 0.5, y: 0.5, w: '90%', fontSize: 24, bold: true, color: '1E293B' });
     
-    const tableRows = [
+    const tableRows: any[] = [
       [{ text: "Quarter", options: { bold: true } }, { text: "Growth (%)", options: { bold: true } }, { text: "Attrition (%)", options: { bold: true } }],
       ["Q1", "85%", "15%"],
       ["Q2", "72%", "18%"],
