@@ -80,9 +80,14 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ context, title = "Report Assist
       {!isOpen && (
         <button 
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-brand-blue text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition z-50 flex items-center justify-center hover:scale-105"
+          className="fixed bottom-6 right-6 bg-brand-blue text-white pl-5 pr-6 py-4 rounded-full shadow-2xl hover:bg-blue-700 transition z-50 flex items-center justify-center gap-3 hover:scale-105 animate-bounce"
+          style={{ animationIterationCount: 3 }}
         >
-          <MessageSquare size={24} />
+          <div className="relative">
+            <MessageSquare size={24} />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-brand-blue rounded-full"></span>
+          </div>
+          <span className="font-semibold whitespace-nowrap">Ask AI Assistant</span>
         </button>
       )}
 
