@@ -1,0 +1,7 @@
+incident_id,datetime_occurred,severity,root_cause,category,affected_process,resolution_time_hours,status
+INC-0009,2026-08-02T09:15:00Z,High,Case escalated by customer Jane Doe (account 4598123490) after duplicate charge in Loan Origination.,Data Quality,Loan Origination,12,Resolved
+INC-0018,2026-08-05T14:30:00Z,Medium,Support ticket referenced customer John Smith, national ID 19801212-3456, complaining about Payment Processing delay.,Outage,Payment Processing,4,Resolved
+INC-0027,2026-08-07T11:45:00Z,High,Support ticket referenced customer Alice Johnson, national ID 19920304-9876, complaining about Mobile Banking App delay.,Outage,Mobile Banking,6,Resolved
+INC-0033,2026-08-09T08:00:00Z,High,Rule-engine misfire delaying transaction reviews.,Security,Fraud Detection,8,Resolved
+INC-0034,2026-08-09T08:30:00Z,High,Rule-engine misfire delaying transaction reviews.,Security,Fraud Detection,6,Resolved
+INC-0035,2026-08-09T09:00:00Z,High,Rule-engine misfire delaying transaction reviews.,Security,Fraud Detection,5,Resolved

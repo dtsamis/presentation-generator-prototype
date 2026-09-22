@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import EmployeeHome from './pages/EmployeeHome';
 import AdminDashboard from './pages/AdminDashboard';
 import ReportView from './pages/ReportView';
+import RiskAnalysisReport from './pages/RiskAnalysisReport';
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
           <nav className="flex space-x-6 text-sm text-gray-600">
             <Link to="/" className="hover:text-brand-blue">Employee Home</Link>
             <Link to="/admin" className="hover:text-brand-blue">Admin Dashboard</Link>
-            <Link to="/report" className="hover:text-brand-blue">Report View</Link>
+            <Link to="/report" className="hover:text-brand-blue">Fraud Report</Link>
+            <Link to="/report/risk" className="hover:text-brand-blue">Risk Report</Link>
           </nav>
         </header>
 
@@ -26,6 +28,7 @@ function App() {
             <Route path="/" element={<EmployeeHome />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/report" element={<ReportView />} />
+            <Route path="/report/risk" element={<RiskAnalysisReport />} />
           </Routes>
         </main>
       </div>

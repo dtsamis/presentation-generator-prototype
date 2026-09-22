@@ -53,7 +53,7 @@ const EmployeeHome = () => {
       // Simulate file upload, processing, and navigating to report
       setTimeout(() => {
         setIsUploading(false);
-        navigate('/report');
+        navigate('/report/risk');
       }, 1500);
     }
   };

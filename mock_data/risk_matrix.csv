@@ -1,0 +1,6 @@
+risk_id,risk_description,likelihood,impact,risk_category,risk_owner,status,date_last_assessed
+RSK-0011,Regulatory reporting single-approver dependency - mitigated.,Low,High,Regulatory,Compliance,Mitigated,2026-08-15
+RSK-0015,Elevated phishing attempts targeting Payments staff.,High,High,Cyber,InfoSec,Open,2026-08-20
+RSK-0016,Vendor SLA breach risk for Fraud Detection service.,Med,Med,Operational,Compliance,Open,2026-08-21
+RSK-0017,Legacy failover gap in Mobile Banking App.,Med,High,IT,Engineering,Open,2026-08-22
+RSK-0009,Manual reconciliation risk in Loan Origination — automated.,Low,Med,Operational,Retail Banking,Closed,2026-08-10

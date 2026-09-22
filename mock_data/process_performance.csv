@@ -1,0 +1,5 @@
+process_name,period,measured_value,target_value,business_unit
+Fraud Detection,2026-08-01,65,90,Compliance
+Fraud Detection,2026-07-01,87,90,Compliance
+Payment Processing,2026-08-01,91,95,Payments
+Loan Origination,2026-08-01,94,92,Retail Banking
