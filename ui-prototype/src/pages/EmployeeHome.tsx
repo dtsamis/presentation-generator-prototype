@@ -49,12 +49,22 @@ const EmployeeHome = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      const fileName = e.target.files[0].name.toLowerCase();
       setIsUploading(true);
-      // Simulate file upload, processing, and navigating to report
+      
+      // Simulate backend analysis of the uploaded data shape
       setTimeout(() => {
         setIsUploading(false);
-        navigate('/report/risk');
-      }, 1500);
+        // Dynamic routing based on the provided data
+        if (fileName.includes('risk')) {
+          navigate('/report/risk');
+        } else if (fileName.includes('performance') || fileName.includes('process')) {
+          navigate('/report');
+        } else {
+          // Default fallback for demo
+          navigate('/report');
+        }
+      }, 2000);
     }
   };
 
