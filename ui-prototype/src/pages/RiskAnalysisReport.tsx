@@ -10,8 +10,34 @@ const riskData = [
   { name: 'IT', value: 4, color: '#10B981' }, // Green
 ];
 
+// Mock database mapping categories to specific risks for drill-down
+const drillDownData: Record<string, any[]> = {
+  Cyber: [
+    { id: 'RSK-0015', name: 'Targeted Phishing (Payments)', likelihood: 'High', impact: 'High', owner: 'InfoSec', desc: 'Highly sophisticated phishing campaigns bypassing tier-1 email filters, specifically targeting staff with payment authorization limits.' },
+    { id: 'RSK-0021', name: 'Ransomware threat via Vendor', likelihood: 'Med', impact: 'High', owner: 'InfoSec', desc: 'Recent breach at 3rd party vendor increases lateral movement risk.' },
+    { id: 'RSK-0033', name: 'Unpatched VPN Gateway', likelihood: 'Low', impact: 'High', owner: 'NetSec', desc: 'Zero-day vulnerability announced; patching scheduled for this weekend.' }
+  ],
+  Operational: [
+    { id: 'RSK-0009', name: 'Manual reconciliation risk (Automated)', likelihood: 'Low', impact: 'Med', owner: 'Retail', desc: 'Was manual, now successfully automated and closed.' },
+    { id: 'RSK-0016', name: 'Vendor SLA breach risk', likelihood: 'Med', impact: 'Med', owner: 'Compliance', desc: 'Fraud detection service missing 99.9% uptime targets.' }
+  ],
+  Regulatory: [
+    { id: 'RSK-0011', name: 'Reporting single-approver dependency', likelihood: 'Low', impact: 'High', owner: 'Compliance', desc: 'Mitigated by cross-training and dual-auth requirement.' },
+    { id: 'RSK-0044', name: 'GDPR Data Subject Request backlog', likelihood: 'High', impact: 'Med', owner: 'Privacy', desc: 'Volume of requests exceeding 30-day SLA.' }
+  ],
+  IT: [
+    { id: 'RSK-0017', name: 'Mobile App Failover Gap', likelihood: 'Med', impact: 'High', owner: 'Engineering', desc: 'Secondary active-active database cluster under-provisioned.' },
+    { id: 'RSK-0050', name: 'Legacy Mainframe End-of-Life', likelihood: 'High', impact: 'High', owner: 'Architecture', desc: 'Hardware support expiring in 6 months, migration delayed.' }
+  ]
+};
+
 const RiskAnalysisReport = () => {
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const handlePieClick = (data: any) => {
+    setSelectedCategory(selectedCategory === data.name ? null : data.name);
+  };
 
   const exportToPPT = () => {
     setIsExporting(true);
@@ -73,8 +99,10 @@ const RiskAnalysisReport = () => {
       });
   };
 
+  const currentDrillDown = selectedCategory ? drillDownData[selectedCategory] : [];
+
   return (
-    <div className="max-w-6xl mx-auto p-8">
+    <div className="max-w-6xl mx-auto p-8 pb-20">
       {/* Header */}
       <div className="bg-slate-800 text-white rounded-xl p-6 mb-8 shadow-sm">
         <div className="flex justify-between items-start">
@@ -110,8 +138,9 @@ const RiskAnalysisReport = () => {
           
           {/* Chart Section */}
           <div className="col-span-1 border-r border-gray-100 pr-8">
-            <h2 className="text-sm font-semibold text-gray-800 mb-6">Open Risks by Category</h2>
-            <div className="h-48 relative">
+            <h2 className="text-sm font-semibold text-gray-800 mb-2">Open Risks by Category</h2>
+            <p className="text-xs text-brand-blue mb-4">Click a slice to drill down into underlying data</p>
+            <div className="h-48 relative cursor-pointer">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -122,19 +151,22 @@ const RiskAnalysisReport = () => {
                     outerRadius={80}
                     paddingAngle={5}
                     dataKey="value"
+                    onClick={handlePieClick}
                   >
                     {riskData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color} 
+                        className="transition duration-300 hover:opacity-80"
+                        stroke={selectedCategory === entry.name ? '#1E293B' : 'none'}
+                        strokeWidth={selectedCategory === entry.name ? 3 : 0}
+                      />
                     ))}
                   </Pie>
                   <RechartsTooltip />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" onClick={handlePieClick} wrapperStyle={{ cursor: 'pointer' }} />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-            
-            <div className="mt-6 bg-red-50 text-red-700 p-3 rounded text-sm font-medium text-center border border-red-100">
-              High Severity Alert: 2 Cyber Risks
             </div>
           </div>
 
@@ -160,41 +192,35 @@ const RiskAnalysisReport = () => {
         </div>
       </div>
 
-      {/* Deep Dive Section */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Critical Open Risks</h2>
-        <p className="text-sm text-gray-500 mb-6">Highest impact risks requiring immediate attention or mitigation plans.</p>
-
-        <div className="grid grid-cols-2 gap-6">
-          {/* Card 1 */}
-          <div className="border border-red-200 bg-red-50/30 rounded-lg p-5">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">RSK-0015</span>
-              <span className="text-xs font-medium text-gray-500">Owner: InfoSec</span>
+      {/* Drill Down Section - Dynamically renders based on pie chart clicks */}
+      {selectedCategory && (
+        <div className="bg-white rounded-xl border border-brand-blue shadow-lg p-8 mb-6 animate-fade-in">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">{selectedCategory} Risks Breakdown</h2>
+              <p className="text-sm text-gray-500">Filtering underlying source data (risk_matrix.csv) for {selectedCategory} category.</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mt-2 mb-2">Targeted Phishing (Payments)</h3>
-            <p className="text-sm text-gray-700 mb-4">Highly sophisticated phishing campaigns bypassing tier-1 email filters, specifically targeting staff with payment authorization limits.</p>
-            <div className="flex gap-2">
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Likelihood: High</span>
-              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Impact: High</span>
-            </div>
+            <button onClick={() => setSelectedCategory(null)} className="text-sm text-brand-blue hover:underline">Close Layer</button>
           </div>
 
-          {/* Card 2 */}
-          <div className="border border-orange-200 bg-orange-50/30 rounded-lg p-5">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded">RSK-0017</span>
-              <span className="text-xs font-medium text-gray-500">Owner: Engineering</span>
-            </div>
-            <h3 className="font-semibold text-gray-900 mt-2 mb-2">Mobile App Failover Gap</h3>
-            <p className="text-sm text-gray-700 mb-4">The secondary active-active database cluster for mobile banking auth is under-provisioned, risking downtime during a primary failure.</p>
-            <div className="flex gap-2">
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Likelihood: Med</span>
-              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Impact: High</span>
-            </div>
+          <div className="grid grid-cols-2 gap-6">
+            {currentDrillDown.map(item => (
+              <div key={item.id} className="border border-gray-200 bg-gray-50/50 rounded-lg p-5">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-xs font-bold text-slate-700 bg-slate-200 px-2 py-1 rounded">{item.id}</span>
+                  <span className="text-xs font-medium text-gray-500">Owner: {item.owner}</span>
+                </div>
+                <h3 className="font-semibold text-gray-900 mt-2 mb-2">{item.name}</h3>
+                <p className="text-sm text-gray-700 mb-4">{item.desc}</p>
+                <div className="flex gap-2">
+                  <span className={`text-xs px-2 py-1 rounded ${item.likelihood === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>Likelihood: {item.likelihood}</span>
+                  <span className={`text-xs px-2 py-1 rounded ${item.impact === 'High' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>Impact: {item.impact}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

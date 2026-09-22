@@ -119,23 +119,32 @@ const EmployeeHome = () => {
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Quick Actions</h2>
             <div className="grid grid-cols-4 gap-4">
               
-              <div className="bg-brand-blue rounded-xl p-4 text-white shadow-sm cursor-pointer hover:bg-blue-700 transition">
+              <div 
+                onClick={() => navigate('/report')}
+                className="bg-brand-blue rounded-xl p-4 text-white shadow-sm cursor-pointer hover:bg-blue-700 transition"
+              >
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mb-6">
                   <FileText size={18} />
                 </div>
                 <h3 className="font-semibold text-sm">New Monthly Report</h3>
-                <p className="text-xs text-white/70 mt-1">Upload this period's source data</p>
+                <p className="text-xs text-white/70 mt-1">Generate standard performance deck</p>
               </div>
               
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition">
+              <div 
+                onClick={() => navigate('/report/risk')}
+                className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition"
+              >
                 <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-6 text-gray-600">
                   <LayoutTemplate size={18} />
                 </div>
-                <h3 className="font-semibold text-sm text-gray-800">Open a Deck</h3>
-                <p className="text-xs text-gray-500 mt-1">Ask questions or request changes</p>
+                <h3 className="font-semibold text-sm text-gray-800">Risk Analysis</h3>
+                <p className="text-xs text-gray-500 mt-1">Drill-down interactive risk report</p>
               </div>
 
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition relative">
+              <div 
+                onClick={() => navigate('/report')}
+                className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition relative"
+              >
                 <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-red-500"></div>
                 <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center mb-6 text-teal-600">
                   <TrendingUp size={18} />
@@ -144,12 +153,15 @@ const EmployeeHome = () => {
                 <p className="text-xs text-gray-500 mt-1">1 anomaly flagged this month</p>
               </div>
 
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition">
+              <div 
+                onClick={() => navigate('/admin')}
+                className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition"
+              >
                 <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mb-6 text-orange-500">
                   <CalendarClock size={18} />
                 </div>
-                <h3 className="font-semibold text-sm text-gray-800">Scheduled Reports</h3>
-                <p className="text-xs text-gray-500 mt-1">Manage upcoming monthly reports</p>
+                <h3 className="font-semibold text-sm text-gray-800">Admin Pipeline</h3>
+                <p className="text-xs text-gray-500 mt-1">Manage flags & data gates</p>
               </div>
             </div>
           </div>
