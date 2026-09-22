@@ -42,56 +42,53 @@ const RiskAnalysisReport = () => {
   const exportToPPT = () => {
     setIsExporting(true);
     let pres = new pptxgen();
-    let slide = pres.addSlide();
-
-    // Slide Title
-    slide.addText("Enterprise Risk Analysis — Q3 2026", {
+    
+    // Slide 1: Title
+    let slide1 = pres.addSlide();
+    slide1.addText("Enterprise Risk Analysis — Q3 2026", {
       x: 0.5, y: 0.5, w: '90%', h: 0.8,
       fontSize: 24, bold: true, color: '1E293B'
     });
-    slide.addText("InfoSec & Compliance · September 2026 · Scheduled report", {
+    slide1.addText(`Generated from system data (${riskData.length} categories tracked)`, {
       x: 0.5, y: 1.2, w: '90%', h: 0.4,
       fontSize: 12, color: '64748B'
     });
 
-    // Executive Summary block
-    slide.addShape(pres.ShapeType.rect, {
-      x: 0.5, y: 1.8, w: '40%', h: 3, fill: 'F8FAFC', line: { color: 'E2E8F0' }
-    });
-    slide.addText("Executive Summary", {
-      x: 0.7, y: 2.0, w: '35%', h: 0.3, fontSize: 14, bold: true, color: '1E293B'
-    });
-    
-    const summaryBullets = [
-      { text: "Cyber Threat Increase: Elevated phishing attempts (RSK-0015) targeting Payments staff.", options: { bullet: true, color: '334155' } },
-      { text: "Operational Stability: Manual reconciliation risk (RSK-0009) automated and closed.", options: { bullet: true, color: '334155' } },
-      { text: "IT Infrastructure: Legacy failover gaps (RSK-0017) marked for Q4.", options: { bullet: true, color: '334155' } }
-    ];
-    slide.addText(summaryBullets, { x: 0.7, y: 2.4, w: '36%', h: 2, fontSize: 12 });
+    // Extract critical risks dynamically from the data structure
+    const allRisks = Object.values(drillDownData).flat();
+    const criticalRisks = allRisks.filter(r => r.impact === 'High' || r.likelihood === 'High');
 
-    // Critical Open Risks Block
-    slide.addShape(pres.ShapeType.rect, {
-      x: 5.0, y: 1.8, w: '45%', h: 3, fill: 'FEF2F2', line: { color: 'FECACA' }
+    // Slide 2: Critical Risks Data
+    let slide2 = pres.addSlide();
+    slide2.addText("Critical Open Risks (High Impact/Likelihood)", {
+      x: 0.5, y: 0.5, w: '90%', h: 0.6, fontSize: 18, bold: true, color: '991B1B'
     });
-    slide.addText("Critical Open Risks", {
-      x: 5.2, y: 2.0, w: '40%', h: 0.3, fontSize: 14, bold: true, color: '991B1B'
-    });
+
+    const criticalBullets = criticalRisks.flatMap(r => [
+      { text: `[${r.id}] ${r.name} - Likelihood: ${r.likelihood}, Impact: ${r.impact}`, options: { bullet: true, color: '7F1D1D', bold: true } },
+      { text: `Owner: ${r.owner} | ${r.desc}`, options: { indentLevel: 1, color: '7F1D1D' } }
+    ]);
     
-    const criticalBullets = [
-      { text: "[RSK-0015] Targeted Phishing (Payments) - High Likelihood, High Impact", options: { bullet: true, color: '7F1D1D', bold: true } },
-      { text: "Highly sophisticated phishing campaigns bypassing tier-1 email filters.", options: { indentLevel: 1, color: '7F1D1D' } },
-      { text: "[RSK-0017] Mobile App Failover Gap - Med Likelihood, High Impact", options: { bullet: true, color: '9A3412', bold: true } },
-      { text: "Secondary active-active database cluster under-provisioned.", options: { indentLevel: 1, color: '9A3412' } }
+    slide2.addText(criticalBullets, { x: 0.5, y: 1.5, w: '90%', h: 3, fontSize: 11 });
+    
+    // Add Chart for Category breakdown
+    const chartData = [
+      {
+        name: "Risks",
+        labels: riskData.map(d => d.name),
+        values: riskData.map(d => d.value)
+      }
     ];
-    slide.addText(criticalBullets, { x: 5.2, y: 2.4, w: '40%', h: 2, fontSize: 11 });
+    
+    slide2.addChart(pres.ChartType.bar, chartData, { x: 0.5, y: 3.5, w: 6, h: 2, showLegend: true });
 
     // Footer
-    slide.addText("Compliance-checked · Audit ID RSK-2026-Q3-001", {
+    slide2.addText("Compliance-checked automatically.", {
       x: 0.5, y: 5.2, w: '90%', h: 0.3, fontSize: 9, color: '94A3B8'
     });
 
     // Save
-    pres.writeFile({ fileName: "Enterprise_Risk_Analysis_Q3_2026.pptx" })
+    pres.writeFile({ fileName: "Dynamic_Risk_Analysis_Report.pptx" })
       .then(() => setIsExporting(false))
       .catch((e) => {
         console.error(e);
