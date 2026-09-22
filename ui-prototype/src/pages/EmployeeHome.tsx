@@ -38,9 +38,10 @@ const EmployeeHome = () => {
       // Navigate dynamically based on selected view
       if (activeView === 'upload_risk') {
         navigate('/report/risk', { state });
-      } else {
-        // Fraud and General share the /report view for now
+      } else if (activeView === 'upload_fraud') {
         navigate('/report', { state });
+      } else {
+        navigate('/report/general', { state });
       }
     }, 1500);
   };
@@ -221,7 +222,8 @@ const EmployeeHome = () => {
               className="p-5 border border-gray-100 rounded-2xl hover:bg-blue-50/50 hover:border-blue-100 cursor-pointer transition group shadow-sm hover:shadow"
               onClick={() => {
                 if(item.type === 'risk') navigate('/report/risk');
-                else navigate('/report');
+                else if (item.type === 'fraud') navigate('/report');
+                else navigate('/report/general');
               }}
             >
               <div className="flex items-start gap-4">

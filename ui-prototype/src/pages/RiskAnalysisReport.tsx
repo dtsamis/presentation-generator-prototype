@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import pptxgen from 'pptxgenjs';
 import { Download } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ChatWidget from '../components/ChatWidget';
 
 const riskData = [
@@ -35,6 +35,7 @@ const drillDownData: Record<string, any[]> = {
 
 const RiskAnalysisReport = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isExporting, setIsExporting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [approvals, setApprovals] = useState<Record<string, 'approved' | 'rejected' | 'unhandled'>>({});
@@ -124,18 +125,26 @@ const RiskAnalysisReport = () => {
             <h1 className="text-2xl font-bold mb-1">Enterprise Risk Analysis — Q3 2026</h1>
             <p className="text-sm text-slate-300 mb-3">InfoSec & Compliance · September 2026 · Scheduled report</p>
           </div>
-          <button 
-            onClick={exportToPPT}
-            disabled={isExporting}
-            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 border border-slate-500 px-4 py-2 rounded transition text-sm font-medium"
-          >
-            {isExporting ? (
-              <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <Download size={16} />
-            )}
-            {isExporting ? 'Generating PPT...' : 'Export to PPT'}
-          </button>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 border border-slate-500 px-4 py-2 rounded transition text-sm font-medium"
+            >
+              Back to Home
+            </button>
+            <button 
+              onClick={exportToPPT}
+              disabled={isExporting}
+              className="flex items-center gap-2 bg-brand-blue hover:bg-blue-700 border border-blue-600 px-4 py-2 rounded transition text-sm font-medium"
+            >
+              {isExporting ? (
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Download size={16} />
+              )}
+              {isExporting ? 'Generating PPT...' : 'Export to PPT'}
+            </button>
+          </div>
         </div>
         <div className="bg-slate-700/50 rounded-lg p-3 inline-block mt-2 border border-slate-600">
           <p className="text-xs font-medium text-white flex items-center gap-2">

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import pptxgen from 'pptxgenjs';
+import { Download } from 'lucide-react';
 import ChatWidget from '../components/ChatWidget';
 
 const data = [
@@ -39,12 +41,33 @@ const drillDownData: Record<string, any[]> = {
 
 const ReportView = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
-  const sources: string[] = location.state?.sources || ['process_performance.csv'];
+  const sources: string[] = location.state?.sources || ['fraud_logs.csv'];
 
   const handleBarClick = (data: any) => {
     setSelectedRegion(selectedRegion === data.name ? null : data.name);
+  };
+
+  const exportToPPT = () => {
+    setIsExporting(true);
+    let pres = new pptxgen();
+    
+    // Slide 1: Title
+    let slide1 = pres.addSlide();
+    slide1.addText("Fraud Detection — Monthly Report", {
+      x: 0.5, y: 0.5, w: '90%', h: 0.8,
+      fontSize: 24, bold: true, color: '1E293B'
+    });
+    
+    pres.writeFile({ fileName: "Fraud_Detection_Report.pptx" })
+      .then(() => setIsExporting(false))
+      .catch((e) => {
+        console.error(e);
+        setIsExporting(false);
+      });
   };
 
   const currentDrillDown = selectedRegion ? drillDownData[selectedRegion] : [];
@@ -61,9 +84,33 @@ const ReportView = () => {
     <div className="max-w-6xl mx-auto p-8 pb-20">
       {/* Header */}
       <div className="bg-brand-blue text-white rounded-xl p-6 mb-8 shadow-sm">
-        <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
-        <p className="text-sm text-white/80 mb-4">Compliance · August 2026 · Scheduled report (MOC material)</p>
-        <div className="bg-white/10 rounded-lg p-3 inline-block border border-white/20">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Fraud Detection — Monthly Report</h1>
+            <p className="text-sm text-white/80 mb-4">Compliance · August 2026 · Scheduled report (MOC material)</p>
+          </div>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 bg-blue-800 hover:bg-blue-900 border border-blue-700 px-4 py-2 rounded transition text-sm font-medium"
+            >
+              Back to Home
+            </button>
+            <button 
+              onClick={exportToPPT}
+              disabled={isExporting}
+              className="flex items-center gap-2 bg-white text-brand-blue hover:bg-gray-100 px-4 py-2 rounded transition text-sm font-medium shadow-sm"
+            >
+              {isExporting ? (
+                <div className="w-4 h-4 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Download size={16} />
+              )}
+              {isExporting ? 'Generating PPT...' : 'Export to PPT'}
+            </button>
+          </div>
+        </div>
+        <div className="bg-white/10 rounded-lg p-3 inline-block border border-white/20 mt-2">
           <p className="text-xs font-medium text-white/90 flex items-center gap-2">
             <span className="uppercase tracking-wider text-white/60">Source Data:</span>
             {sources.map(src => (
